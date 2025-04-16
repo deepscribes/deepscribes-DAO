@@ -1,0 +1,45 @@
+{
+  "name": "@deepscribes/deepscribes-dao",
+  "version": "1.0.0",
+  "description": "The DAO for Deepscribes",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "test": "jest",
+    "prepublishOnly": "npm run build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/deepscribes/deepscribes-DAO.git"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/"
+  },
+  "keywords": [
+    "DAO"
+  ],
+  "author": "Nicola Migone",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/deepscribes/deepscribes-DAO/issues"
+  },
+  "homepage": "https://github.com/deepscribes/deepscribes-DAO#readme",
+  "devDependencies": {
+    "@types/jest": "^29.5.14",
+    "@types/node": "^22.14.1",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.3.2",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3"
+  },
+  "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.788.0",
+    "@aws-sdk/client-s3": "^3.787.0",
+    "@aws-sdk/s3-request-presigner": "^3.787.0",
+    "@aws-sdk/util-dynamodb": "^3.788.0"
+  }
+}
