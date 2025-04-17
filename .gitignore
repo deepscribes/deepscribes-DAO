@@ -1,4 +1,9 @@
 # Node modules
 node_modules
-# Build output
+# Test artifacts
+coverage
+# Build artifacts
 dist
+# Environment variables
+.env
+.env.*

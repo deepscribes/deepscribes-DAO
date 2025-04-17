@@ -2,7 +2,7 @@ name: Build & Publish
 
 permissions:
   contents: write
-  packages: write # Needed to publish to GitHub Packages
+  packages: write
 
 on:
   push:
@@ -26,6 +26,9 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
+
+      - name: Run tests
+        run: npm test
 
       - name: Build project
         run: npm run build

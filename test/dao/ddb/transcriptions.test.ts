@@ -1,4 +1,5 @@
 // tests/dao/transcriptions.test.ts
+
 import {
   createTranscription,
   getTranscriptionById,
@@ -6,86 +7,125 @@ import {
   deleteTranscription,
   updateTranscriptionTitle,
 } from "../../../src/dao/ddb/transcriptions";
+
 import { ddb } from "../../../src/utils/ddb";
+
 import {
-  SAMPLE_ANOTHER_TRANSCRIPTION_TITLE,
   SAMPLE_TRANSCRIPTION,
   SAMPLE_TRANSCRIPTION_ID,
   SAMPLE_TRANSCRIPTION_ITEM,
+  SAMPLE_USER_ID,
+  SAMPLE_ANOTHER_TRANSCRIPTION_TITLE,
+  SAMPLE_TRANSCRIPTION_TABLE_NAME,
 } from "../../constants";
 
-jest.mock("../../../src/utils/ddb");
+// Mock the whole ddb module
+jest.mock("../../../src/utils/ddb", () => ({
+  ddb: {
+    send: jest.fn(),
+  },
+}));
+
+const mockedSend = ddb.send as jest.Mock;
 
 beforeEach(() => {
-  process.env.DDB_TABLE_NAME = "transcriptions";
-});
-
-afterEach(() => {
+  process.env.DDB_TABLE_NAME = SAMPLE_TRANSCRIPTION_TABLE_NAME;
   jest.clearAllMocks();
 });
 
-describe("Transcriptions DAO", () => {
-  test("should create a transcription", async () => {
-    (ddb.send as jest.Mock).mockResolvedValueOnce({});
+describe("Transcriptions DAO Unit Tests", () => {
+  test("createTranscription should call PutItemCommand with correct params", async () => {
+    mockedSend.mockResolvedValueOnce({});
 
-    await createTranscription(SAMPLE_TRANSCRIPTION);
+    await createTranscription({
+      title: SAMPLE_TRANSCRIPTION.title,
+      status: SAMPLE_TRANSCRIPTION.status,
+      userId: SAMPLE_TRANSCRIPTION.userId,
+    });
 
-    expect(ddb.send).toHaveBeenCalledWith(
+    expect(mockedSend).toHaveBeenCalledWith(
       expect.objectContaining({
-        TableName: process.env.DDB_TABLE_NAME,
-        Item: {
-          title: { S: SAMPLE_TRANSCRIPTION.title },
-          status: { S: SAMPLE_TRANSCRIPTION.status },
-          userId: { S: SAMPLE_TRANSCRIPTION.userId },
-        },
+        input: expect.objectContaining({
+          TableName: SAMPLE_TRANSCRIPTION_TABLE_NAME,
+          Item: expect.objectContaining({
+            title: { S: SAMPLE_TRANSCRIPTION.title },
+            status: { S: SAMPLE_TRANSCRIPTION.status },
+            userId: { S: SAMPLE_TRANSCRIPTION.userId },
+          }),
+        }),
       }),
     );
   });
 
-  test("should retrieve a transcription", async () => {
-    (ddb.send as jest.Mock).mockResolvedValueOnce({
-      Item: SAMPLE_TRANSCRIPTION_ITEM,
-    });
+  test("getTranscriptionById should call GetItemCommand and return item", async () => {
+    mockedSend.mockResolvedValueOnce({ Item: SAMPLE_TRANSCRIPTION_ITEM });
 
     const result = await getTranscriptionById(SAMPLE_TRANSCRIPTION_ID);
 
-    expect(ddb.send).toHaveBeenCalledWith(
+    expect(mockedSend).toHaveBeenCalledWith(
       expect.objectContaining({
-        TableName: process.env.DDB_TABLE_NAME,
-        Key: { id: { S: SAMPLE_TRANSCRIPTION_ID } },
+        input: {
+          TableName: "transcriptions",
+          Key: { id: { S: SAMPLE_TRANSCRIPTION_ID } },
+        },
       }),
     );
     expect(result).toEqual(SAMPLE_TRANSCRIPTION_ITEM);
   });
 
-  test("should update a transcription", async () => {
-    (ddb.send as jest.Mock).mockResolvedValueOnce({});
+  test("getAllUserTranscriptions should call QueryCommand and return items", async () => {
+    mockedSend.mockResolvedValueOnce({ Items: [SAMPLE_TRANSCRIPTION_ITEM] });
+
+    const result = await getAllUserTranscriptions(SAMPLE_USER_ID);
+
+    expect(mockedSend).toHaveBeenCalledWith(
+      expect.objectContaining({
+        input: expect.objectContaining({
+          TableName: "transcriptions",
+          IndexName: expect.any(String),
+          KeyConditionExpression: "userId = :uid",
+          ExpressionAttributeValues: {
+            ":uid": { S: SAMPLE_USER_ID },
+          },
+        }),
+      }),
+    );
+
+    expect(result).toEqual([SAMPLE_TRANSCRIPTION_ITEM]);
+  });
+
+  test("updateTranscriptionTitle should call UpdateItemCommand with correct title update", async () => {
+    mockedSend.mockResolvedValueOnce({});
 
     await updateTranscriptionTitle(
       SAMPLE_TRANSCRIPTION_ID,
       SAMPLE_ANOTHER_TRANSCRIPTION_TITLE,
     );
 
-    expect(ddb.send).toHaveBeenCalledWith(
+    expect(mockedSend).toHaveBeenCalledWith(
       expect.objectContaining({
-        input: {
-          TableName: expect.any(String),
+        input: expect.objectContaining({
+          TableName: SAMPLE_TRANSCRIPTION_TABLE_NAME,
           Key: { id: { S: SAMPLE_TRANSCRIPTION_ID } },
-          UpdateExpression: expect.stringContaining("title"),
-        },
+          UpdateExpression: "SET #title = :title",
+          ExpressionAttributeNames: { "#title": "title" },
+          ExpressionAttributeValues: {
+            ":title": { S: SAMPLE_ANOTHER_TRANSCRIPTION_TITLE },
+          },
+        }),
       }),
     );
   });
 
-  test("should delete a transcription", async () => {
-    (ddb.send as jest.Mock).mockResolvedValueOnce({});
+  test("deleteTranscription should call DeleteItemCommand with correct key", async () => {
+    mockedSend.mockResolvedValueOnce({});
 
     await deleteTranscription(SAMPLE_TRANSCRIPTION_ID);
 
-    expect(ddb.send).toHaveBeenCalledWith(
+    expect(mockedSend).toHaveBeenCalledWith(
       expect.objectContaining({
         input: expect.objectContaining({
-          TableName: expect.any(String),
+          TableName: SAMPLE_TRANSCRIPTION_TABLE_NAME,
           Key: { id: { S: SAMPLE_TRANSCRIPTION_ID } },
         }),
       }),

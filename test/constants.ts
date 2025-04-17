@@ -3,6 +3,8 @@ import {
   TranscriptionStatus,
 } from "../src/models/transcription";
 
+export const SAMPLE_TRANSCRIPTION_TABLE_NAME = "transcriptions";
+
 export const SAMPLE_TRANSCRIPTION_ID = "1";
 export const SAMPLE_USER_ID = "clerk__user_id";
 export const SAMPLE_TRANSCRIPTION_TITLE = "Test Transcription";

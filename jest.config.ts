@@ -7,11 +7,6 @@ const config: Config = {
     "^.+\\.ts?$": "ts-jest",
   },
   moduleFileExtensions: ["ts", "js"],
-  globals: {
-    "ts-jest": {
-      isolatedModules: true,
-    },
-  },
 };
 
 export default config;
