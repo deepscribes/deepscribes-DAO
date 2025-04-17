@@ -19,6 +19,14 @@ export async function createTranscription(params: CreateTranscriptionInput) {
   const transcriptionId = randomUUID();
   const createdAt = new Date().toISOString();
 
+  const transcription = {
+    id: transcriptionId,
+    title: params.title,
+    status: params.status,
+    createdAt,
+    userId: params.userId,
+  } as const;
+
   const item: Record<string, AttributeValue> = {
     id: { S: transcriptionId },
     title: { S: params.title },
@@ -27,9 +35,14 @@ export async function createTranscription(params: CreateTranscriptionInput) {
     userId: { S: params.userId },
   };
 
-  return ddb.send(
+  const res = await ddb.send(
     new PutItemCommand({ TableName: process.env.DDB_TABLE_NAME, Item: item }),
   );
+
+  return {
+    transcription,
+    $metadata: res.$metadata,
+  };
 }
 
 export async function getTranscriptionById(id: DDBTranscription["id"]) {
