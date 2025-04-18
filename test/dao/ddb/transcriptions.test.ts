@@ -6,7 +6,9 @@ import {
   getAllUserTranscriptions,
   deleteTranscription,
   updateTranscriptionTitle,
+  updateTranscriptionStatus,
 } from "../../../src/dao/ddb/transcriptions";
+import { TranscriptionStatus } from "../../../src/models/transcription";
 
 import { ddb } from "../../../src/utils/ddb";
 
@@ -112,6 +114,24 @@ describe("Transcriptions DAO Unit Tests", () => {
           ExpressionAttributeValues: {
             ":title": { S: SAMPLE_ANOTHER_TRANSCRIPTION_TITLE },
           },
+        }),
+      }),
+    );
+  });
+
+  test("updateTranscriptionStatus should call UpdateItemCommand with correct status update", async () => {
+    mockedSend.mockResolvedValueOnce({});
+    const newStatus = TranscriptionStatus.READY;
+    await updateTranscriptionStatus(SAMPLE_TRANSCRIPTION_ID, newStatus);
+
+    expect(mockedSend).toHaveBeenCalledWith(
+      expect.objectContaining({
+        input: expect.objectContaining({
+          TableName: SAMPLE_TRANSCRIPTION_TABLE_NAME,
+          Key: { id: { S: SAMPLE_TRANSCRIPTION_ID } },
+          UpdateExpression: "SET #status = :status",
+          ExpressionAttributeNames: { "#status": "status" },
+          ExpressionAttributeValues: { ":status": { S: newStatus } },
         }),
       }),
     );

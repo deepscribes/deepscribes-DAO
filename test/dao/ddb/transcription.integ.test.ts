@@ -12,7 +12,6 @@ import {
   SAMPLE_TRANSCRIPTION_TITLE,
   SAMPLE_ANOTHER_TRANSCRIPTION_TITLE,
 } from "../../constants";
-import { v4 as uuidv4 } from "uuid";
 
 const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
 
@@ -30,8 +29,6 @@ describe("Transcription DAO", () => {
   });
 
   it("fetches a transcription by ID", async () => {
-    const transcriptionId = uuidv4();
-
     await createTranscription({
       title: SAMPLE_TRANSCRIPTION_TITLE,
       status: SAMPLE_TRANSCRIPTION.status,
@@ -81,6 +78,20 @@ describe("Transcription DAO", () => {
     const updated = await getTranscriptionById(createdId);
     const unmarshalled = unmarshall(updated!);
     expect(unmarshalled.title).toBe(SAMPLE_ANOTHER_TRANSCRIPTION_TITLE);
+  });
+
+  it("updates the transcription status", async () => {
+    const result = await updateTranscriptionTitle(
+      createdId,
+      SAMPLE_TRANSCRIPTION.status,
+    );
+    expect(result.$metadata.httpStatusCode).toBe(200);
+
+    await delay(100);
+
+    const updated = await getTranscriptionById(createdId);
+    const unmarshalled = unmarshall(updated!);
+    expect(unmarshalled.status).toBe(SAMPLE_TRANSCRIPTION.status);
   });
 
   it("deletes the transcription", async () => {

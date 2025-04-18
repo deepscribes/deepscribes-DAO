@@ -8,7 +8,11 @@ import {
 } from "@aws-sdk/client-dynamodb";
 import { randomUUID } from "node:crypto";
 import { ddb } from "../../utils/ddb";
-import { DDBTranscription } from "../../models/transcription";
+import {
+  DDBTranscription,
+  TranscriptionId,
+  TranscriptionStatus,
+} from "../../models/transcription";
 
 export type CreateTranscriptionInput = Omit<
   DDBTranscription,
@@ -45,7 +49,7 @@ export async function createTranscription(params: CreateTranscriptionInput) {
   };
 }
 
-export async function getTranscriptionById(id: DDBTranscription["id"]) {
+export async function getTranscriptionById(id: TranscriptionId) {
   const result = await ddb.send(
     new GetItemCommand({
       TableName: process.env.DDB_TABLE_NAME,
@@ -55,9 +59,7 @@ export async function getTranscriptionById(id: DDBTranscription["id"]) {
   return result.Item;
 }
 
-export async function getAllUserTranscriptions(
-  userId: DDBTranscription["userId"],
-) {
+export async function getAllUserTranscriptions(userId: string) {
   const result = await ddb.send(
     new QueryCommand({
       TableName: process.env.DDB_TABLE_NAME,
@@ -72,7 +74,10 @@ export async function getAllUserTranscriptions(
   return result.Items;
 }
 
-export async function updateTranscriptionTitle(id: string, title: string) {
+export async function updateTranscriptionTitle(
+  id: TranscriptionId,
+  title: string,
+) {
   return ddb.send(
     new UpdateItemCommand({
       TableName: process.env.DDB_TABLE_NAME,
@@ -84,7 +89,22 @@ export async function updateTranscriptionTitle(id: string, title: string) {
   );
 }
 
-export async function deleteTranscription(id: string) {
+export async function updateTranscriptionStatus(
+  id: TranscriptionId,
+  status: TranscriptionStatus,
+) {
+  return ddb.send(
+    new UpdateItemCommand({
+      TableName: process.env.DDB_TABLE_NAME,
+      Key: { id: { S: id } },
+      UpdateExpression: "SET #status = :status",
+      ExpressionAttributeNames: { "#status": "status" },
+      ExpressionAttributeValues: { ":status": { S: status } },
+    }),
+  );
+}
+
+export async function deleteTranscription(id: TranscriptionId) {
   return ddb.send(
     new DeleteItemCommand({
       TableName: process.env.DDB_TABLE_NAME,
