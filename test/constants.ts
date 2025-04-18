@@ -3,8 +3,13 @@ import {
   TranscriptionStatus,
 } from "../src/models/transcription";
 
-export const SAMPLE_TRANSCRIPTION_TABLE_NAME = "transcriptions";
+// ======== S3 ========
+export const MOCK_AUDIO_BUCKET_NAME = "mock-audio-bucket";
+export const MOCK_TRANSCRIPTIONS_BUCKET_NAME = "mock-transcriptions-bucket";
+export const MOCK_TRANSCRIPTION_TEMP_BUCKET_NAME = "mock-temp-bucket";
 
+// ======= DDB ========
+export const SAMPLE_TRANSCRIPTION_TABLE_NAME = "transcriptions";
 export const SAMPLE_TRANSCRIPTION_ID = "1";
 export const SAMPLE_USER_ID = "clerk__user_id";
 export const SAMPLE_TRANSCRIPTION_TITLE = "Test Transcription";
