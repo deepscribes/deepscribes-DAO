@@ -3,6 +3,10 @@ import {
   TranscriptionStatus,
 } from "../src/models/transcription";
 
+// ======== Clerk ========
+export const TEST_TEST_USER_ID = "user_2qo3wTIwIr5tvx3zJYxb3BiG5SU";
+export const PROD_TEST_USER_ID = "user_2vwaop97p3Yvciz4jVaBZdwGHKk";
+
 // ======== S3 ========
 export const MOCK_AUDIO_BUCKET_NAME = "mock-audio-bucket";
 export const MOCK_TRANSCRIPTIONS_BUCKET_NAME = "mock-transcriptions-bucket";
@@ -33,3 +37,6 @@ export const SAMPLE_TRANSCRIPTION_ITEM = {
   userId: { S: SAMPLE_USER_ID },
   createdAt: { S: SAMPLE_TRANSCRIPTION_CREATED_AT_DATE },
 };
+
+export const SAMPLE_TRANSCRIPTION_IDEMPOTENCY_ID = "idempotency_id_123";
+export const SAMPLE_ANOTHER_TRANSCRIPTION_IDEMPOTENCY_ID = "idempotency_id_456";

@@ -1,6 +1,6 @@
 {
   "name": "@deepscribes/deepscribes-dao",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "The DAO for Deepscribes",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -10,6 +10,7 @@
   "scripts": {
     "build": "tsc",
     "test": "npm run test:unit",
+    "test:full": "npm run test:unit && npm run test:integ",
     "test:unit": "jest --testMatch \"**/*.test.ts\" --testPathIgnorePatterns=\".*\\.integ\\.test\\.ts$\" --coverage",
     "test:integ": "node run_integ.js",
     "test:integration": "jest --testMatch \"**/*.integ.test.ts\"",

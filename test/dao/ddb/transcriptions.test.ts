@@ -72,7 +72,23 @@ describe("Transcriptions DAO Unit Tests", () => {
         },
       }),
     );
-    expect(result).toEqual(SAMPLE_TRANSCRIPTION_ITEM);
+    expect(result).toEqual(SAMPLE_TRANSCRIPTION);
+  });
+
+  test("getTranscriptionById should return null if item not found", async () => {
+    mockedSend.mockResolvedValueOnce({});
+
+    const result = await getTranscriptionById(SAMPLE_TRANSCRIPTION_ID);
+
+    expect(mockedSend).toHaveBeenCalledWith(
+      expect.objectContaining({
+        input: {
+          TableName: "transcriptions",
+          Key: { id: { S: SAMPLE_TRANSCRIPTION_ID } },
+        },
+      }),
+    );
+    expect(result).toBeNull();
   });
 
   test("getAllUserTranscriptions should call QueryCommand and return items", async () => {
@@ -93,7 +109,7 @@ describe("Transcriptions DAO Unit Tests", () => {
       }),
     );
 
-    expect(result).toEqual([SAMPLE_TRANSCRIPTION_ITEM]);
+    expect(result).toEqual([SAMPLE_TRANSCRIPTION]);
   });
 
   test("updateTranscriptionTitle should call UpdateItemCommand with correct title update", async () => {

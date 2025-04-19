@@ -1,4 +1,15 @@
-export async function getUserDetailsFromUserId(userId: string) {
+import { ClerkUser } from "../../models/user";
+
+/**
+ * Retrieves user details from Clerk using the provided user ID.
+ * @requires `process.env.CLERK_API_KEY`
+ * @readonly
+ * @param userId - The user ID to fetch details for.
+ * @returns
+ */
+export async function getUserDetailsFromUserId(
+  userId: string,
+): Promise<ClerkUser> {
   const CLERK_API_URL = "https://api.clerk.dev/v1/users";
   const CLERK_API_KEY = process.env.CLERK_API_KEY;
 

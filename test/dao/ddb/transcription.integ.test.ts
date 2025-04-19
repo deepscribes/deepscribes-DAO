@@ -1,11 +1,13 @@
+import { create } from "domain";
 import {
   createTranscription,
   getTranscriptionById,
   getAllUserTranscriptions,
   updateTranscriptionTitle,
   deleteTranscription,
+  updateTranscriptionStatus,
 } from "../../../src/dao/ddb/transcriptions";
-import { unmarshall } from "@aws-sdk/util-dynamodb";
+import { TranscriptionStatus } from "../../../src/models/transcription";
 import {
   SAMPLE_TRANSCRIPTION,
   SAMPLE_USER_ID,
@@ -15,92 +17,88 @@ import {
 
 const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
 
+afterAll(() => {
+  // Cleanup the ddb table
+  getAllUserTranscriptions(SAMPLE_USER_ID).then((items) => {
+    if (items) {
+      items.forEach(async (item) => {
+        await deleteTranscription(item.id);
+      });
+    }
+  });
+});
+
 describe("Transcription DAO", () => {
-  let createdId: string;
-
   it("creates a transcription", async () => {
-    const result = await createTranscription({
-      title: SAMPLE_TRANSCRIPTION_TITLE,
-      status: SAMPLE_TRANSCRIPTION.status,
-      userId: SAMPLE_USER_ID,
-    });
-
+    const result = await createTranscription(SAMPLE_TRANSCRIPTION);
+    expect(result).toBeDefined();
+    expect(result.transcription.id).toBeDefined();
+    expect(result.transcription.userId).toBe(SAMPLE_USER_ID);
+    expect(result.transcription.title).toBe(SAMPLE_TRANSCRIPTION_TITLE);
+    expect(result.transcription.status).toBe(SAMPLE_TRANSCRIPTION.status);
     expect(result.$metadata.httpStatusCode).toBe(200);
   });
 
   it("fetches a transcription by ID", async () => {
-    await createTranscription({
-      title: SAMPLE_TRANSCRIPTION_TITLE,
-      status: SAMPLE_TRANSCRIPTION.status,
-      userId: SAMPLE_USER_ID,
-    });
-
-    // Just grab any transcription for the user to verify
-    await delay(100);
-    const all = await getAllUserTranscriptions(SAMPLE_USER_ID);
-    const match = all
-      ?.map((e) => unmarshall(e))
-      .find((t) => t.title === SAMPLE_TRANSCRIPTION_TITLE);
-
-    expect(match).toBeDefined();
-    createdId = match!.id;
-
-    const result = await getTranscriptionById(createdId);
+    const res = await createTranscription(SAMPLE_TRANSCRIPTION);
+    const result = await getTranscriptionById(res.transcription.id);
     expect(result).toBeDefined();
+    expect(result!.id).toBe(res.transcription.id);
+    expect(result!.userId).toBe(SAMPLE_USER_ID);
+    expect(result!.title).toBe(SAMPLE_TRANSCRIPTION_TITLE);
+    expect(result!.status).toBe(SAMPLE_TRANSCRIPTION.status);
+  });
 
-    const unmarshalled = unmarshall(result!);
-    expect(unmarshalled.id).toBe(createdId);
-    expect(unmarshalled.userId).toBe(SAMPLE_USER_ID);
-    expect(unmarshalled.title).toBe(SAMPLE_TRANSCRIPTION_TITLE);
-    expect(unmarshalled.status).toBe(SAMPLE_TRANSCRIPTION.status);
+  it("returns null for a non-existent transcription ID", async () => {
+    const result = await getTranscriptionById("non-existent-id");
+    expect(result).toBeNull();
   });
 
   it("queries all transcriptions for a user", async () => {
-    await delay(100);
+    const res = await createTranscription(SAMPLE_TRANSCRIPTION);
     const items = await getAllUserTranscriptions(SAMPLE_USER_ID);
     expect(items?.length).toBeGreaterThan(0);
 
-    const list = items!.map((e) => unmarshall(e));
-    const match = list.find((t) => t.id === createdId);
+    const match = items.find((t) => t.id === res.transcription.id);
     expect(match).toBeDefined();
     expect(match!.title).toBe(SAMPLE_TRANSCRIPTION_TITLE);
   });
 
   it("updates the transcription title", async () => {
+    const res = await createTranscription(SAMPLE_TRANSCRIPTION);
     const result = await updateTranscriptionTitle(
-      createdId,
+      res.transcription.id,
       SAMPLE_ANOTHER_TRANSCRIPTION_TITLE,
     );
     expect(result.$metadata.httpStatusCode).toBe(200);
 
     await delay(100);
 
-    const updated = await getTranscriptionById(createdId);
-    const unmarshalled = unmarshall(updated!);
-    expect(unmarshalled.title).toBe(SAMPLE_ANOTHER_TRANSCRIPTION_TITLE);
+    const updated = await getTranscriptionById(res.transcription.id);
+    expect(updated).toBeDefined();
+    expect(updated!.title).toBe(SAMPLE_ANOTHER_TRANSCRIPTION_TITLE);
   });
 
   it("updates the transcription status", async () => {
-    const result = await updateTranscriptionTitle(
-      createdId,
-      SAMPLE_TRANSCRIPTION.status,
+    const res = await createTranscription(SAMPLE_TRANSCRIPTION);
+    const result = await updateTranscriptionStatus(
+      res.transcription.id,
+      TranscriptionStatus.ERROR,
     );
     expect(result.$metadata.httpStatusCode).toBe(200);
 
-    await delay(100);
-
-    const updated = await getTranscriptionById(createdId);
-    const unmarshalled = unmarshall(updated!);
-    expect(unmarshalled.status).toBe(SAMPLE_TRANSCRIPTION.status);
+    const updated = await getTranscriptionById(res.transcription.id);
+    expect(updated).toBeDefined();
+    expect(updated!.status).toBe(TranscriptionStatus.ERROR);
   });
 
   it("deletes the transcription", async () => {
-    const result = await deleteTranscription(createdId);
+    const res = await createTranscription(SAMPLE_TRANSCRIPTION);
+    delay(100);
+    const items = await getAllUserTranscriptions(SAMPLE_USER_ID);
+    expect(items?.length).toBeGreaterThan(0);
+    const result = await deleteTranscription(res.transcription.id);
     expect(result.$metadata.httpStatusCode).toBe(200);
-
-    await delay(100);
-
-    const deleted = await getTranscriptionById(createdId);
-    expect(deleted).toBeUndefined();
+    expect(await getTranscriptionById(res.transcription.id)).toBeNull();
   });
 });

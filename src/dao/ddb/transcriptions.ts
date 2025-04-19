@@ -13,12 +13,19 @@ import {
   TranscriptionId,
   TranscriptionStatus,
 } from "../../models/transcription";
+import { unmarshall } from "@aws-sdk/util-dynamodb";
 
 export type CreateTranscriptionInput = Omit<
   DDBTranscription,
   "id" | "createdAt"
 >;
 
+/**
+ * Creates a transcription in the database
+ * @requires process.env.DDB_TABLE_NAME
+ * @param params - The transcription to create
+ * @returns The created transcription, as well as the metadata from the request
+ */
 export async function createTranscription(params: CreateTranscriptionInput) {
   const transcriptionId = randomUUID();
   const createdAt = new Date().toISOString();
@@ -49,17 +56,36 @@ export async function createTranscription(params: CreateTranscriptionInput) {
   };
 }
 
-export async function getTranscriptionById(id: TranscriptionId) {
+/**
+ * Gets a transcription by ID
+ * @requires process.env.DDB_TABLE_NAME
+ * @param id - The transcription ID to fetch
+ * @returns The transcription if found, `null` otherwise
+ */
+export async function getTranscriptionById(
+  id: TranscriptionId,
+): Promise<DDBTranscription | null> {
   const result = await ddb.send(
     new GetItemCommand({
       TableName: process.env.DDB_TABLE_NAME,
       Key: { id: { S: id } },
     }),
   );
-  return result.Item;
+  if (!result.Item) {
+    return null;
+  }
+  return unmarshall(result.Item) as DDBTranscription;
 }
 
-export async function getAllUserTranscriptions(userId: string) {
+/**
+ * Retrieves all transcriptions for a user
+ * @requires process.env.DDB_TABLE_NAME
+ * @param userId - The user ID to fetch transcriptions for
+ * @returns
+ */
+export async function getAllUserTranscriptions(
+  userId: string,
+): Promise<DDBTranscription[]> {
   const result = await ddb.send(
     new QueryCommand({
       TableName: process.env.DDB_TABLE_NAME,
@@ -71,14 +97,21 @@ export async function getAllUserTranscriptions(userId: string) {
       },
     }),
   );
-  return result.Items;
+  return result.Items.map((e) => unmarshall(e)) as DDBTranscription[];
 }
 
+/**
+ * Updates the title of a transcription
+ * @requires process.env.DDB_TABLE_NAME
+ * @param id The transcription id
+ * @param title The new title
+ * @returns
+ */
 export async function updateTranscriptionTitle(
   id: TranscriptionId,
   title: string,
 ) {
-  return ddb.send(
+  return await ddb.send(
     new UpdateItemCommand({
       TableName: process.env.DDB_TABLE_NAME,
       Key: { id: { S: id } },
@@ -89,11 +122,18 @@ export async function updateTranscriptionTitle(
   );
 }
 
+/**
+ * Updates the status of a transcription
+ * @requires process.env.DDB_TABLE_NAME
+ * @param id The transcription id
+ * @param status The new status
+ * @returns
+ */
 export async function updateTranscriptionStatus(
   id: TranscriptionId,
   status: TranscriptionStatus,
 ) {
-  return ddb.send(
+  return await ddb.send(
     new UpdateItemCommand({
       TableName: process.env.DDB_TABLE_NAME,
       Key: { id: { S: id } },
@@ -104,8 +144,14 @@ export async function updateTranscriptionStatus(
   );
 }
 
+/**
+ * Deletes a transcription
+ * @requires process.env.DDB_TABLE_NAME
+ * @param id The transcription id
+ * @returns
+ */
 export async function deleteTranscription(id: TranscriptionId) {
-  return ddb.send(
+  return await ddb.send(
     new DeleteItemCommand({
       TableName: process.env.DDB_TABLE_NAME,
       Key: { id: { S: id } },
