@@ -43,6 +43,7 @@ describe("Transcriptions DAO Unit Tests", () => {
       title: SAMPLE_TRANSCRIPTION.title,
       status: SAMPLE_TRANSCRIPTION.status,
       userId: SAMPLE_TRANSCRIPTION.userId,
+      id: SAMPLE_TRANSCRIPTION_ID,
     });
 
     expect(mockedSend).toHaveBeenCalledWith(
@@ -50,12 +51,37 @@ describe("Transcriptions DAO Unit Tests", () => {
         input: expect.objectContaining({
           TableName: SAMPLE_TRANSCRIPTION_TABLE_NAME,
           Item: expect.objectContaining({
+            id: { S: SAMPLE_TRANSCRIPTION_ID },
             title: { S: SAMPLE_TRANSCRIPTION.title },
             status: { S: SAMPLE_TRANSCRIPTION.status },
             userId: { S: SAMPLE_TRANSCRIPTION.userId },
           }),
         }),
-      }),
+      })
+    );
+  });
+
+  test("createTranscription should call PutItemCommand and create an id if not present", async () => {
+    mockedSend.mockResolvedValueOnce({});
+
+    await createTranscription({
+      title: SAMPLE_TRANSCRIPTION.title,
+      status: SAMPLE_TRANSCRIPTION.status,
+      userId: SAMPLE_TRANSCRIPTION.userId,
+    });
+
+    expect(mockedSend).toHaveBeenCalledWith(
+      expect.objectContaining({
+        input: expect.objectContaining({
+          TableName: SAMPLE_TRANSCRIPTION_TABLE_NAME,
+          Item: expect.objectContaining({
+            id: { S: expect.any(String) }, // id is generated
+            title: { S: SAMPLE_TRANSCRIPTION.title },
+            status: { S: SAMPLE_TRANSCRIPTION.status },
+            userId: { S: SAMPLE_TRANSCRIPTION.userId },
+          }),
+        }),
+      })
     );
   });
 
@@ -70,7 +96,7 @@ describe("Transcriptions DAO Unit Tests", () => {
           TableName: "transcriptions",
           Key: { id: { S: SAMPLE_TRANSCRIPTION_ID } },
         },
-      }),
+      })
     );
     expect(result).toEqual(SAMPLE_TRANSCRIPTION);
   });
@@ -86,7 +112,7 @@ describe("Transcriptions DAO Unit Tests", () => {
           TableName: "transcriptions",
           Key: { id: { S: SAMPLE_TRANSCRIPTION_ID } },
         },
-      }),
+      })
     );
     expect(result).toBeNull();
   });
@@ -106,7 +132,7 @@ describe("Transcriptions DAO Unit Tests", () => {
             ":uid": { S: SAMPLE_USER_ID },
           },
         }),
-      }),
+      })
     );
 
     expect(result).toEqual([SAMPLE_TRANSCRIPTION]);
@@ -117,7 +143,7 @@ describe("Transcriptions DAO Unit Tests", () => {
 
     await updateTranscriptionTitle(
       SAMPLE_TRANSCRIPTION_ID,
-      SAMPLE_ANOTHER_TRANSCRIPTION_TITLE,
+      SAMPLE_ANOTHER_TRANSCRIPTION_TITLE
     );
 
     expect(mockedSend).toHaveBeenCalledWith(
@@ -131,7 +157,7 @@ describe("Transcriptions DAO Unit Tests", () => {
             ":title": { S: SAMPLE_ANOTHER_TRANSCRIPTION_TITLE },
           },
         }),
-      }),
+      })
     );
   });
 
@@ -149,7 +175,7 @@ describe("Transcriptions DAO Unit Tests", () => {
           ExpressionAttributeNames: { "#status": "status" },
           ExpressionAttributeValues: { ":status": { S: newStatus } },
         }),
-      }),
+      })
     );
   });
 
@@ -164,7 +190,7 @@ describe("Transcriptions DAO Unit Tests", () => {
           TableName: SAMPLE_TRANSCRIPTION_TABLE_NAME,
           Key: { id: { S: SAMPLE_TRANSCRIPTION_ID } },
         }),
-      }),
+      })
     );
   });
 });
