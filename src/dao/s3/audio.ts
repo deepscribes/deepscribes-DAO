@@ -13,7 +13,7 @@ import { s3 } from "../../utils/s3";
 const AUDIO_BUCKET = process.env.AWS_BUCKET_NAME!;
 const TEMP_BUCKET = process.env.TRANSCRIPTION_TEMP_BUCKET_NAME!;
 const TRANSCRIPTIONS_BUKET = process.env.TRANSCRIPTIONS_BUCKET_NAME!;
-const SIGNED_URL_EXPIRATION = 60 * 60;
+const SIGNED_URL_EXPIRATION = 60 * 60; // 1 hour
 
 /**
  * Helper to create a signed URL for either GET or PUT
@@ -21,7 +21,7 @@ const SIGNED_URL_EXPIRATION = 60 * 60;
 export async function createSignedUrl(
   method: "GET" | "PUT",
   bucket: string,
-  key: string,
+  key: string
 ): Promise<string> {
   if (bucket === undefined) {
     throw new Error("Bucket name is undefined");
@@ -63,12 +63,12 @@ export function getOptimizedAudioUrl(transcriptionId: TranscriptionId) {
 
 export function putRawTranscriptionUrl(transcriptionId: TranscriptionId) {
   const key = `${RAW_TRANSCRIPTION_PREFIX}${transcriptionId}`;
-  return createSignedUrl("PUT", TEMP_BUCKET, key);
+  return createSignedUrl("PUT", TRANSCRIPTIONS_BUKET, key);
 }
 
 export function getRawTranscriptionUrl(transcriptionId: TranscriptionId) {
   const key = `${RAW_TRANSCRIPTION_PREFIX}${transcriptionId}`;
-  return createSignedUrl("GET", TEMP_BUCKET, key);
+  return createSignedUrl("GET", TRANSCRIPTIONS_BUKET, key);
 }
 
 // --------- FINAL TRANSCRIPTION ---------

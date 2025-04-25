@@ -70,7 +70,7 @@ describe("createSignedUrl", () => {
     expect(getSignedUrl).toHaveBeenCalledWith(
       expect.anything(), // s3 client
       expect.any(GetObjectCommand),
-      { expiresIn: 3600 },
+      { expiresIn: 3600 }
     );
   });
 
@@ -85,19 +85,19 @@ describe("createSignedUrl", () => {
     expect(getSignedUrl).toHaveBeenCalledWith(
       expect.anything(),
       expect.any(PutObjectCommand),
-      { expiresIn: 3600 },
+      { expiresIn: 3600 }
     );
   });
 
   test("throws error when bucket is undefined", async () => {
     await expect(
-      createSignedUrl("GET", undefined as any, "key"),
+      createSignedUrl("GET", undefined as any, "key")
     ).rejects.toThrow("Bucket name is undefined");
   });
 
   test("throws error when key is undefined", async () => {
     await expect(
-      createSignedUrl("GET", "bucket", undefined as any),
+      createSignedUrl("GET", "bucket", undefined as any)
     ).rejects.toThrow("Key is undefined");
   });
 });
@@ -145,7 +145,7 @@ describe("S3 DAO", () => {
   test("putRawTranscriptionUrl calls PutObjectCommand on temp bucket", async () => {
     const url = await putRawTranscriptionUrl(transcriptionId);
     expect(PutObjectCommand).toHaveBeenCalledWith({
-      Bucket: MOCK_TRANSCRIPTION_TEMP_BUCKET_NAME,
+      Bucket: MOCK_TRANSCRIPTIONS_BUCKET_NAME,
       Key: expect.stringContaining(transcriptionId),
     });
     expect(url).toBe(signedUrl);
@@ -154,7 +154,7 @@ describe("S3 DAO", () => {
   test("getRawTranscriptionUrl calls GetObjectCommand on temp bucket", async () => {
     const url = await getRawTranscriptionUrl(transcriptionId);
     expect(GetObjectCommand).toHaveBeenCalledWith({
-      Bucket: MOCK_TRANSCRIPTION_TEMP_BUCKET_NAME,
+      Bucket: MOCK_TRANSCRIPTIONS_BUCKET_NAME,
       Key: expect.stringContaining(transcriptionId),
     });
     expect(url).toBe(signedUrl);
