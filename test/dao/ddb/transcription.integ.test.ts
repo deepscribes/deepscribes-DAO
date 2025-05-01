@@ -1,4 +1,3 @@
-import { create } from "domain";
 import {
   createTranscription,
   getTranscriptionById,
@@ -6,6 +5,7 @@ import {
   updateTranscriptionTitle,
   deleteTranscription,
   updateTranscriptionStatus,
+  updateTranscriptionDuration,
 } from "../../../src/dao/ddb/transcriptions";
 import { TranscriptionStatus } from "../../../src/models/transcription";
 import {
@@ -36,6 +36,10 @@ describe("Transcription DAO", () => {
     expect(result.transcription.userId).toBe(SAMPLE_USER_ID);
     expect(result.transcription.title).toBe(SAMPLE_TRANSCRIPTION_TITLE);
     expect(result.transcription.status).toBe(SAMPLE_TRANSCRIPTION.status);
+    expect(result.transcription.createdAt).toBeDefined();
+    expect(result.transcription.transcriptionLength).toBe(
+      SAMPLE_TRANSCRIPTION.transcriptionLength
+    );
     expect(result.$metadata.httpStatusCode).toBe(200);
   });
 
@@ -68,7 +72,7 @@ describe("Transcription DAO", () => {
     const res = await createTranscription(SAMPLE_TRANSCRIPTION);
     const result = await updateTranscriptionTitle(
       res.transcription.id,
-      SAMPLE_ANOTHER_TRANSCRIPTION_TITLE,
+      SAMPLE_ANOTHER_TRANSCRIPTION_TITLE
     );
     expect(result.$metadata.httpStatusCode).toBe(200);
 
@@ -83,13 +87,22 @@ describe("Transcription DAO", () => {
     const res = await createTranscription(SAMPLE_TRANSCRIPTION);
     const result = await updateTranscriptionStatus(
       res.transcription.id,
-      TranscriptionStatus.ERROR,
+      TranscriptionStatus.ERROR
     );
     expect(result.$metadata.httpStatusCode).toBe(200);
 
     const updated = await getTranscriptionById(res.transcription.id);
     expect(updated).toBeDefined();
     expect(updated!.status).toBe(TranscriptionStatus.ERROR);
+  });
+
+  it("updates the transcription length", async () => {
+    const res = await createTranscription(SAMPLE_TRANSCRIPTION);
+    const result = await updateTranscriptionDuration(res.transcription.id, 100);
+    expect(result.$metadata.httpStatusCode).toBe(200);
+    const updated = await getTranscriptionById(res.transcription.id);
+    expect(updated).toBeDefined();
+    expect(updated!.transcriptionLength).toBe(100);
   });
 
   it("deletes the transcription", async () => {

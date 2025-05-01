@@ -52,6 +52,12 @@ export type DDBTranscription = {
    * @external https://clerk.dev/docs/reference/clerk-api#users
    */
   userId: string;
+  /**
+   * The length of the transcription in seconds
+   * @readonly
+   * @default 0
+   */
+  transcriptionLength: number;
 };
 
 export type Transcription = Pick<DDBTranscription, "id" | "createdAt">;

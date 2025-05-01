@@ -6,7 +6,7 @@ import {
   UpdateItemCommand,
   AttributeValue,
 } from "@aws-sdk/client-dynamodb";
-import { randomUUID } from "node:crypto";
+import { randomUUID } from "crypto";
 import { ddb } from "../../utils/ddb";
 import {
   DDBTranscription,
@@ -17,9 +17,10 @@ import { unmarshall } from "@aws-sdk/util-dynamodb";
 
 export type CreateTranscriptionInput = Omit<
   DDBTranscription,
-  "id" | "createdAt"
+  "id" | "createdAt" | "transcriptionLength"
 > & {
   id?: TranscriptionId | undefined;
+  transcriptionLength?: number | undefined;
 };
 
 /**
@@ -38,7 +39,8 @@ export async function createTranscription(params: CreateTranscriptionInput) {
     status: params.status,
     createdAt,
     userId: params.userId,
-  } as const;
+    transcriptionLength: params.transcriptionLength || 0,
+  } as const as DDBTranscription;
 
   const item: Record<string, AttributeValue> = {
     id: { S: transcriptionId },
@@ -46,6 +48,9 @@ export async function createTranscription(params: CreateTranscriptionInput) {
     status: { S: params.status },
     createdAt: { S: createdAt },
     userId: { S: params.userId },
+    transcriptionLength: {
+      N: params.transcriptionLength?.toString() || "0",
+    },
   };
 
   const res = await ddb.send(
@@ -142,6 +147,32 @@ export async function updateTranscriptionStatus(
       UpdateExpression: "SET #status = :status",
       ExpressionAttributeNames: { "#status": "status" },
       ExpressionAttributeValues: { ":status": { S: status } },
+    })
+  );
+}
+
+/**
+ * Updates the duration of a transcription
+ * @requires process.env.DDB_TABLE_NAME
+ * @param id The transcription id
+ * @param duration The new duration
+ * @returns
+ */
+export async function updateTranscriptionDuration(
+  id: TranscriptionId,
+  duration: number
+) {
+  return await ddb.send(
+    new UpdateItemCommand({
+      TableName: process.env.DDB_TABLE_NAME,
+      Key: { id: { S: id } },
+      UpdateExpression: "SET #transcriptionLength = :transcriptionLength",
+      ExpressionAttributeNames: {
+        "#transcriptionLength": "transcriptionLength",
+      },
+      ExpressionAttributeValues: {
+        ":transcriptionLength": { N: duration.toString() },
+      },
     })
   );
 }

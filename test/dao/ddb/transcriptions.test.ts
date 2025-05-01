@@ -7,6 +7,7 @@ import {
   deleteTranscription,
   updateTranscriptionTitle,
   updateTranscriptionStatus,
+  updateTranscriptionDuration,
 } from "../../../src/dao/ddb/transcriptions";
 import { TranscriptionStatus } from "../../../src/models/transcription";
 
@@ -19,6 +20,7 @@ import {
   SAMPLE_USER_ID,
   SAMPLE_ANOTHER_TRANSCRIPTION_TITLE,
   SAMPLE_TRANSCRIPTION_TABLE_NAME,
+  SAMPLE_TRANSCRIPTION_LENGTH,
 } from "../../constants";
 
 // Mock the whole ddb module
@@ -44,6 +46,7 @@ describe("Transcriptions DAO Unit Tests", () => {
       status: SAMPLE_TRANSCRIPTION.status,
       userId: SAMPLE_TRANSCRIPTION.userId,
       id: SAMPLE_TRANSCRIPTION_ID,
+      transcriptionLength: SAMPLE_TRANSCRIPTION_LENGTH,
     });
 
     expect(mockedSend).toHaveBeenCalledWith(
@@ -55,6 +58,35 @@ describe("Transcriptions DAO Unit Tests", () => {
             title: { S: SAMPLE_TRANSCRIPTION.title },
             status: { S: SAMPLE_TRANSCRIPTION.status },
             userId: { S: SAMPLE_TRANSCRIPTION.userId },
+            transcriptionLength: { N: SAMPLE_TRANSCRIPTION_LENGTH.toString() },
+            createdAt: { S: expect.any(String) }, // createdAt is generated
+          }),
+        }),
+      })
+    );
+  });
+
+  test("createTranscription should call PutItemCommand with correct params when no length", async () => {
+    mockedSend.mockResolvedValueOnce({});
+
+    await createTranscription({
+      title: SAMPLE_TRANSCRIPTION.title,
+      status: SAMPLE_TRANSCRIPTION.status,
+      userId: SAMPLE_TRANSCRIPTION.userId,
+      id: SAMPLE_TRANSCRIPTION_ID,
+    });
+
+    expect(mockedSend).toHaveBeenCalledWith(
+      expect.objectContaining({
+        input: expect.objectContaining({
+          TableName: SAMPLE_TRANSCRIPTION_TABLE_NAME,
+          Item: expect.objectContaining({
+            id: { S: SAMPLE_TRANSCRIPTION_ID },
+            title: { S: SAMPLE_TRANSCRIPTION.title },
+            status: { S: SAMPLE_TRANSCRIPTION.status },
+            userId: { S: SAMPLE_TRANSCRIPTION.userId },
+            transcriptionLength: { N: "0" }, // default length is 0
+            createdAt: { S: expect.any(String) }, // createdAt is generated
           }),
         }),
       })
@@ -174,6 +206,28 @@ describe("Transcriptions DAO Unit Tests", () => {
           UpdateExpression: "SET #status = :status",
           ExpressionAttributeNames: { "#status": "status" },
           ExpressionAttributeValues: { ":status": { S: newStatus } },
+        }),
+      })
+    );
+  });
+
+  test("updateTranscriptionLength should call UpdateItemCommand with correct length update", async () => {
+    mockedSend.mockResolvedValueOnce({});
+    const newLength = 120.5;
+    await updateTranscriptionDuration(SAMPLE_TRANSCRIPTION_ID, newLength);
+
+    expect(mockedSend).toHaveBeenCalledWith(
+      expect.objectContaining({
+        input: expect.objectContaining({
+          TableName: SAMPLE_TRANSCRIPTION_TABLE_NAME,
+          Key: { id: { S: SAMPLE_TRANSCRIPTION_ID } },
+          UpdateExpression: "SET #transcriptionLength = :transcriptionLength",
+          ExpressionAttributeNames: {
+            "#transcriptionLength": "transcriptionLength",
+          },
+          ExpressionAttributeValues: {
+            ":transcriptionLength": { N: newLength.toString() },
+          },
         }),
       })
     );

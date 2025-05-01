@@ -19,8 +19,9 @@ export const SAMPLE_USER_ID = "clerk__user_id";
 export const SAMPLE_TRANSCRIPTION_TITLE = "Test Transcription";
 export const SAMPLE_ANOTHER_TRANSCRIPTION_TITLE = "Another Test Transcription";
 export const SAMPLE_TRANSCRIPTION_CREATED_AT_DATE = new Date(
-  "2023-10-01T12:00:00Z",
+  "2023-10-01T12:00:00Z"
 ).toISOString();
+export const SAMPLE_TRANSCRIPTION_LENGTH = 92.45;
 
 export const SAMPLE_TRANSCRIPTION: DDBTranscription = {
   id: SAMPLE_TRANSCRIPTION_ID,
@@ -28,6 +29,7 @@ export const SAMPLE_TRANSCRIPTION: DDBTranscription = {
   status: TranscriptionStatus.READY,
   title: SAMPLE_TRANSCRIPTION_TITLE,
   userId: SAMPLE_USER_ID,
+  transcriptionLength: SAMPLE_TRANSCRIPTION_LENGTH,
 };
 
 export const SAMPLE_TRANSCRIPTION_ITEM = {
@@ -36,6 +38,7 @@ export const SAMPLE_TRANSCRIPTION_ITEM = {
   status: { S: SAMPLE_TRANSCRIPTION.status },
   userId: { S: SAMPLE_USER_ID },
   createdAt: { S: SAMPLE_TRANSCRIPTION_CREATED_AT_DATE },
+  transcriptionLength: { N: SAMPLE_TRANSCRIPTION_LENGTH.toString() },
 };
 
 export const SAMPLE_TRANSCRIPTION_IDEMPOTENCY_ID = "idempotency_id_123";
