@@ -21,7 +21,8 @@ const SIGNED_URL_EXPIRATION = 60 * 60; // 1 hour
 export async function createSignedUrl(
   method: "GET" | "PUT",
   bucket: string,
-  key: string
+  key: string,
+  contentType?: string
 ): Promise<string> {
   if (bucket === undefined) {
     throw new Error("Bucket name is undefined");
@@ -31,8 +32,16 @@ export async function createSignedUrl(
   }
   const command =
     method === "GET"
-      ? new GetObjectCommand({ Bucket: bucket, Key: key })
-      : new PutObjectCommand({ Bucket: bucket, Key: key });
+      ? new GetObjectCommand({
+          Bucket: bucket,
+          Key: key,
+          ResponseContentType: contentType,
+        })
+      : new PutObjectCommand({
+          Bucket: bucket,
+          Key: key,
+          ContentType: contentType,
+        });
 
   return getSignedUrl(s3, command, { expiresIn: SIGNED_URL_EXPIRATION });
 }
@@ -51,12 +60,12 @@ export function putRawAudioUrl(transcriptionId: TranscriptionId) {
 
 export function putOptimizedAudioUrl(transcriptionId: TranscriptionId) {
   const key = `${OPTIMIZED_AUDIO_PREFIX}${transcriptionId}`;
-  return createSignedUrl("PUT", TEMP_BUCKET, key);
+  return createSignedUrl("PUT", TEMP_BUCKET, key, "audio/ogg");
 }
 
 export function getOptimizedAudioUrl(transcriptionId: TranscriptionId) {
   const key = `${OPTIMIZED_AUDIO_PREFIX}${transcriptionId}`;
-  return createSignedUrl("GET", TEMP_BUCKET, key);
+  return createSignedUrl("GET", TEMP_BUCKET, key, "audio/ogg");
 }
 
 // --------- RAW TRANSCRIPTION (e.g. from Deepgram/Groq) ---------

@@ -129,6 +129,7 @@ describe("S3 DAO", () => {
     expect(PutObjectCommand).toHaveBeenCalledWith({
       Bucket: MOCK_TRANSCRIPTION_TEMP_BUCKET_NAME,
       Key: expect.stringContaining(transcriptionId),
+      ContentType: "audio/ogg",
     });
     expect(url).toBe(signedUrl);
   });
@@ -138,6 +139,7 @@ describe("S3 DAO", () => {
     expect(GetObjectCommand).toHaveBeenCalledWith({
       Bucket: MOCK_TRANSCRIPTION_TEMP_BUCKET_NAME,
       Key: expect.stringContaining(transcriptionId),
+      ResponseContentType: "audio/ogg",
     });
     expect(url).toBe(signedUrl);
   });
