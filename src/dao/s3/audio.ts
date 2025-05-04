@@ -59,12 +59,12 @@ export function putRawAudioUrl(transcriptionId: TranscriptionId) {
 }
 
 export function putOptimizedAudioUrl(transcriptionId: TranscriptionId) {
-  const key = `${OPTIMIZED_AUDIO_PREFIX}${transcriptionId}`;
+  const key = `${OPTIMIZED_AUDIO_PREFIX}${transcriptionId}.ogg`;
   return createSignedUrl("PUT", TEMP_BUCKET, key, "audio/ogg");
 }
 
 export function getOptimizedAudioUrl(transcriptionId: TranscriptionId) {
-  const key = `${OPTIMIZED_AUDIO_PREFIX}${transcriptionId}`;
+  const key = `${OPTIMIZED_AUDIO_PREFIX}${transcriptionId}.ogg`;
   return createSignedUrl("GET", TEMP_BUCKET, key, "audio/ogg");
 }
 
