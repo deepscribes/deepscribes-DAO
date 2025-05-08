@@ -68,6 +68,22 @@ export function getOptimizedAudioUrl(transcriptionId: TranscriptionId) {
   return createSignedUrl("GET", TEMP_BUCKET, key, "audio/ogg");
 }
 
+export function getOptimizedAudioChunkUrl(
+  transcriptionId: TranscriptionId,
+  chunkId: string
+) {
+  const key = `${OPTIMIZED_AUDIO_PREFIX}${transcriptionId}/${chunkId}.ogg`;
+  return createSignedUrl("GET", TEMP_BUCKET, key, "audio/ogg");
+}
+
+export function putOptimizedAudioChunkUrl(
+  transcriptionId: TranscriptionId,
+  chunkId: string
+) {
+  const key = `${OPTIMIZED_AUDIO_PREFIX}${transcriptionId}/${chunkId}.ogg`;
+  return createSignedUrl("PUT", TEMP_BUCKET, key, "audio/ogg");
+}
+
 // --------- RAW TRANSCRIPTION (e.g. from Deepgram/Groq) ---------
 
 export function putRawTranscriptionUrl(transcriptionId: TranscriptionId) {
@@ -77,6 +93,22 @@ export function putRawTranscriptionUrl(transcriptionId: TranscriptionId) {
 
 export function getRawTranscriptionUrl(transcriptionId: TranscriptionId) {
   const key = `${RAW_TRANSCRIPTION_PREFIX}${transcriptionId}`;
+  return createSignedUrl("GET", TRANSCRIPTIONS_BUKET, key);
+}
+
+export function putRawTranscriptionChunkUrl(
+  transcriptionId: TranscriptionId,
+  chunkId: string
+) {
+  const key = `${RAW_TRANSCRIPTION_PREFIX}${transcriptionId}/${chunkId}`;
+  return createSignedUrl("PUT", TRANSCRIPTIONS_BUKET, key);
+}
+
+export function getRawTranscriptionChunkUrl(
+  transcriptionId: TranscriptionId,
+  chunkId: string
+) {
+  const key = `${RAW_TRANSCRIPTION_PREFIX}${transcriptionId}/${chunkId}`;
   return createSignedUrl("GET", TRANSCRIPTIONS_BUKET, key);
 }
 

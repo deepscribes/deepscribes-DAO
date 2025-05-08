@@ -19,6 +19,8 @@ import {
   getFinalTranscriptionUrl,
   putFinalTranscriptionUrl,
   createSignedUrl,
+  putOptimizedAudioChunkUrl,
+  getOptimizedAudioChunkUrl,
 } from "../../../src/dao/s3/audio";
 
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
@@ -139,6 +141,26 @@ describe("S3 DAO", () => {
     expect(GetObjectCommand).toHaveBeenCalledWith({
       Bucket: MOCK_TRANSCRIPTION_TEMP_BUCKET_NAME,
       Key: expect.stringContaining(transcriptionId),
+      ResponseContentType: "audio/ogg",
+    });
+    expect(url).toBe(signedUrl);
+  });
+
+  test("putOptimizedAudioChunkUrl calls PutObjectCommand on temp bucket", async () => {
+    const url = await putOptimizedAudioChunkUrl(transcriptionId, "chunkId");
+    expect(PutObjectCommand).toHaveBeenCalledWith({
+      Bucket: MOCK_TRANSCRIPTION_TEMP_BUCKET_NAME,
+      Key: expect.stringContaining(`${transcriptionId}/chunkId.ogg`),
+      ContentType: "audio/ogg",
+    });
+    expect(url).toBe(signedUrl);
+  });
+
+  test("getOptimizedAudioChunkUrl calls GetObjectCommand on temp bucket", async () => {
+    const url = await getOptimizedAudioChunkUrl(transcriptionId, "chunkId");
+    expect(GetObjectCommand).toHaveBeenCalledWith({
+      Bucket: MOCK_TRANSCRIPTION_TEMP_BUCKET_NAME,
+      Key: expect.stringContaining(`${transcriptionId}/chunkId.ogg`),
       ResponseContentType: "audio/ogg",
     });
     expect(url).toBe(signedUrl);

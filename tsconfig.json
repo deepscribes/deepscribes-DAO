@@ -2,7 +2,8 @@
   "compilerOptions": {
     "outDir": "./dist",
     "declaration": true,
-    "emitDeclarationOnly": false
+    "emitDeclarationOnly": false,
+    "esModuleInterop": true
   },
   "include": ["./src/**/*"]
 }
