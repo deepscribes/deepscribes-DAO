@@ -1,6 +1,6 @@
 {
   "name": "@deepscribes/deepscribes-dao",
-  "version": "20250504.0.1",
+  "version": "20250516.0.1",
   "description": "The DAO for Deepscribes",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -48,6 +48,7 @@
     "@aws-sdk/client-s3": "^3.787.0",
     "@aws-sdk/client-ses": "^3.787.0",
     "@aws-sdk/s3-request-presigner": "^3.787.0",
-    "@aws-sdk/util-dynamodb": "^3.788.0"
+    "@aws-sdk/util-dynamodb": "^3.788.0",
+    "@clerk/backend": "^1.32.2"
   }
 }

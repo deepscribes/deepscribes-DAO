@@ -1,14 +1,6 @@
 // tests/dao/transcriptions.test.ts
 
-import {
-  createTranscription,
-  getTranscriptionById,
-  getAllUserTranscriptions,
-  deleteTranscription,
-  updateTranscriptionTitle,
-  updateTranscriptionStatus,
-  updateTranscriptionDuration,
-} from "../../../src/dao/ddb/transcriptions";
+import { TranscriptionDao } from "../../../src/dao/ddb/transcriptions";
 import { TranscriptionStatus } from "../../../src/models/transcription";
 
 import { ddb } from "../../../src/utils/ddb";
@@ -33,15 +25,16 @@ jest.mock("../../../src/utils/ddb", () => ({
 const mockedSend = ddb.send as jest.Mock;
 
 beforeEach(() => {
-  process.env.DDB_TABLE_NAME = SAMPLE_TRANSCRIPTION_TABLE_NAME;
   jest.clearAllMocks();
 });
 
 describe("Transcriptions DAO Unit Tests", () => {
+  process.env.DDB_TABLE_NAME = SAMPLE_TRANSCRIPTION_TABLE_NAME;
+  const transcriptionDao = new TranscriptionDao();
   test("createTranscription should call PutItemCommand with correct params", async () => {
     mockedSend.mockResolvedValueOnce({});
 
-    await createTranscription({
+    await transcriptionDao.createTranscription({
       title: SAMPLE_TRANSCRIPTION.title,
       status: SAMPLE_TRANSCRIPTION.status,
       userId: SAMPLE_TRANSCRIPTION.userId,
@@ -69,7 +62,7 @@ describe("Transcriptions DAO Unit Tests", () => {
   test("createTranscription should call PutItemCommand with correct params when no length", async () => {
     mockedSend.mockResolvedValueOnce({});
 
-    await createTranscription({
+    await transcriptionDao.createTranscription({
       title: SAMPLE_TRANSCRIPTION.title,
       status: SAMPLE_TRANSCRIPTION.status,
       userId: SAMPLE_TRANSCRIPTION.userId,
@@ -96,7 +89,7 @@ describe("Transcriptions DAO Unit Tests", () => {
   test("createTranscription should call PutItemCommand and create an id if not present", async () => {
     mockedSend.mockResolvedValueOnce({});
 
-    await createTranscription({
+    await transcriptionDao.createTranscription({
       title: SAMPLE_TRANSCRIPTION.title,
       status: SAMPLE_TRANSCRIPTION.status,
       userId: SAMPLE_TRANSCRIPTION.userId,
@@ -120,7 +113,9 @@ describe("Transcriptions DAO Unit Tests", () => {
   test("getTranscriptionById should call GetItemCommand and return item", async () => {
     mockedSend.mockResolvedValueOnce({ Item: SAMPLE_TRANSCRIPTION_ITEM });
 
-    const result = await getTranscriptionById(SAMPLE_TRANSCRIPTION_ID);
+    const result = await transcriptionDao.getTranscriptionById(
+      SAMPLE_TRANSCRIPTION_ID
+    );
 
     expect(mockedSend).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -136,7 +131,9 @@ describe("Transcriptions DAO Unit Tests", () => {
   test("getTranscriptionById should return null if item not found", async () => {
     mockedSend.mockResolvedValueOnce({});
 
-    const result = await getTranscriptionById(SAMPLE_TRANSCRIPTION_ID);
+    const result = await transcriptionDao.getTranscriptionById(
+      SAMPLE_TRANSCRIPTION_ID
+    );
 
     expect(mockedSend).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -152,7 +149,9 @@ describe("Transcriptions DAO Unit Tests", () => {
   test("getAllUserTranscriptions should call QueryCommand and return items", async () => {
     mockedSend.mockResolvedValueOnce({ Items: [SAMPLE_TRANSCRIPTION_ITEM] });
 
-    const result = await getAllUserTranscriptions(SAMPLE_USER_ID);
+    const result = await transcriptionDao.getAllUserTranscriptions(
+      SAMPLE_USER_ID
+    );
 
     expect(mockedSend).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -173,7 +172,7 @@ describe("Transcriptions DAO Unit Tests", () => {
   test("updateTranscriptionTitle should call UpdateItemCommand with correct title update", async () => {
     mockedSend.mockResolvedValueOnce({});
 
-    await updateTranscriptionTitle(
+    await transcriptionDao.updateTranscriptionTitle(
       SAMPLE_TRANSCRIPTION_ID,
       SAMPLE_ANOTHER_TRANSCRIPTION_TITLE
     );
@@ -196,7 +195,10 @@ describe("Transcriptions DAO Unit Tests", () => {
   test("updateTranscriptionStatus should call UpdateItemCommand with correct status update", async () => {
     mockedSend.mockResolvedValueOnce({});
     const newStatus = TranscriptionStatus.READY;
-    await updateTranscriptionStatus(SAMPLE_TRANSCRIPTION_ID, newStatus);
+    await transcriptionDao.updateTranscriptionStatus(
+      SAMPLE_TRANSCRIPTION_ID,
+      newStatus
+    );
 
     expect(mockedSend).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -214,7 +216,10 @@ describe("Transcriptions DAO Unit Tests", () => {
   test("updateTranscriptionLength should call UpdateItemCommand with correct length update", async () => {
     mockedSend.mockResolvedValueOnce({});
     const newLength = 120.5;
-    await updateTranscriptionDuration(SAMPLE_TRANSCRIPTION_ID, newLength);
+    await transcriptionDao.updateTranscriptionDuration(
+      SAMPLE_TRANSCRIPTION_ID,
+      newLength
+    );
 
     expect(mockedSend).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -236,7 +241,7 @@ describe("Transcriptions DAO Unit Tests", () => {
   test("deleteTranscription should call DeleteItemCommand with correct key", async () => {
     mockedSend.mockResolvedValueOnce({});
 
-    await deleteTranscription(SAMPLE_TRANSCRIPTION_ID);
+    await transcriptionDao.deleteTranscription(SAMPLE_TRANSCRIPTION_ID);
 
     expect(mockedSend).toHaveBeenCalledWith(
       expect.objectContaining({

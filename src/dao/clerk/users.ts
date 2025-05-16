@@ -1,30 +1,39 @@
-import { ClerkUser } from "../../models/user";
+import { ClerkClient, createClerkClient } from "@clerk/backend";
+import type { User } from "../../models/user";
 
-/**
- * Retrieves user details from Clerk using the provided user ID.
- * @requires `process.env.CLERK_API_KEY`
- * @readonly
- * @param userId - The user ID to fetch details for.
- * @returns
- */
-export async function getUserDetailsFromUserId(
-  userId: string,
-): Promise<ClerkUser> {
-  const CLERK_API_URL = "https://api.clerk.dev/v1/users";
-  const CLERK_API_KEY = process.env.CLERK_API_KEY;
+export type UserDaoConfig = {
+  CLERK_API_KEY?: string;
+};
 
-  if (!CLERK_API_KEY) {
-    throw new Error("CLERK_API_KEY is not defined in environment variables");
+export class UserDao {
+  private apiKey: string;
+  private clerkInstance: ClerkClient;
+  constructor(config?: UserDaoConfig) {
+    this.apiKey = config?.CLERK_API_KEY ?? process.env.CLERK_API_KEY;
+    if (!this.apiKey) {
+      throw new Error("Couldn't load CLERK_API_KEY");
+    }
+    this.clerkInstance = createClerkClient({ secretKey: this.apiKey });
   }
 
-  return fetch(`${CLERK_API_URL}/${userId}`, {
-    headers: {
-      Authorization: `Bearer ${CLERK_API_KEY}`,
-    },
-  })
-    .then((response) => response.json())
-    .catch((error) => {
-      console.error("Error fetching user details:", error);
-      throw new Error("Failed to fetch user details");
-    });
+  /**
+   * Returns a user, or null if it's not found
+   */
+  public async getUserById(id: string): Promise<User | null> {
+    try {
+      return await this.clerkInstance.users.getUser(id);
+    } catch (e) {
+      console.error("Failed to fetch user details", e);
+      return null;
+    }
+  }
+
+  /**
+   * Creates a new user (only use for testing purposes)
+   */
+  public async createUser(
+    params: Parameters<typeof this.clerkInstance.users.createUser>
+  ) {
+    return await this.clerkInstance.users.createUser(params);
+  }
 }
