@@ -48,13 +48,19 @@ export async function createSignedUrl(
 
 // --------- AUDIO FILES ---------
 
-export function getRawAudioUrl(transcriptionId: TranscriptionId) {
-  const key = `${AUDIO_PREFIX}${transcriptionId}`;
+export function getRawAudioUrl(
+  transcriptionId: TranscriptionId,
+  audioExtension: string
+) {
+  const key = `${AUDIO_PREFIX}${transcriptionId}.${audioExtension}`;
   return createSignedUrl("GET", AUDIO_BUCKET, key);
 }
 
-export function putRawAudioUrl(transcriptionId: TranscriptionId) {
-  const key = `${AUDIO_PREFIX}${transcriptionId}`;
+export function putRawAudioUrl(
+  transcriptionId: TranscriptionId,
+  audioExtension: string
+) {
+  const key = `${AUDIO_PREFIX}${transcriptionId}.${audioExtension}`;
   return createSignedUrl("PUT", AUDIO_BUCKET, key);
 }
 

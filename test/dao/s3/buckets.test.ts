@@ -106,22 +106,23 @@ describe("createSignedUrl", () => {
 
 describe("S3 DAO", () => {
   const transcriptionId = "test-uuid";
+  const audioExtension = "mp3";
   const signedUrl = "https://signed.url/mock";
 
   test("getRawAudioUrl calls GetObjectCommand with correct key", async () => {
-    const url = await getRawAudioUrl(transcriptionId);
+    const url = await getRawAudioUrl(transcriptionId, audioExtension);
     expect(GetObjectCommand).toHaveBeenCalledWith({
       Bucket: MOCK_AUDIO_BUCKET_NAME,
-      Key: expect.stringContaining(transcriptionId),
+      Key: expect.stringContaining(`${transcriptionId}.${audioExtension}`),
     });
     expect(url).toBe(signedUrl);
   });
 
   test("putRawAudioUrl calls PutObjectCommand with correct key", async () => {
-    const url = await putRawAudioUrl(transcriptionId);
+    const url = await putRawAudioUrl(transcriptionId, audioExtension);
     expect(PutObjectCommand).toHaveBeenCalledWith({
       Bucket: MOCK_AUDIO_BUCKET_NAME,
-      Key: expect.stringContaining(transcriptionId),
+      Key: expect.stringContaining(`${transcriptionId}.${audioExtension}`),
     });
     expect(url).toBe(signedUrl);
   });
