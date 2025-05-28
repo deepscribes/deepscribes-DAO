@@ -13,7 +13,6 @@ import {
   SAMPLE_ANOTHER_TRANSCRIPTION_TITLE,
   SAMPLE_TRANSCRIPTION_TABLE_NAME,
   SAMPLE_TRANSCRIPTION_LENGTH,
-  SAMPLE_TRANSCRIPTION_EXTENSION,
 } from "../../constants";
 
 // Mock the whole ddb module
@@ -41,7 +40,6 @@ describe("Transcriptions DAO Unit Tests", () => {
       userId: SAMPLE_TRANSCRIPTION.userId,
       id: SAMPLE_TRANSCRIPTION_ID,
       transcriptionLength: SAMPLE_TRANSCRIPTION_LENGTH,
-      audioExtension: SAMPLE_TRANSCRIPTION_EXTENSION,
     });
 
     expect(mockedSend).toHaveBeenCalledWith(
@@ -69,7 +67,6 @@ describe("Transcriptions DAO Unit Tests", () => {
       status: SAMPLE_TRANSCRIPTION.status,
       userId: SAMPLE_TRANSCRIPTION.userId,
       id: SAMPLE_TRANSCRIPTION_ID,
-      audioExtension: SAMPLE_TRANSCRIPTION_EXTENSION,
     });
 
     expect(mockedSend).toHaveBeenCalledWith(
@@ -96,7 +93,6 @@ describe("Transcriptions DAO Unit Tests", () => {
       title: SAMPLE_TRANSCRIPTION.title,
       status: SAMPLE_TRANSCRIPTION.status,
       userId: SAMPLE_TRANSCRIPTION.userId,
-      audioExtension: SAMPLE_TRANSCRIPTION_EXTENSION,
     });
 
     expect(mockedSend).toHaveBeenCalledWith(

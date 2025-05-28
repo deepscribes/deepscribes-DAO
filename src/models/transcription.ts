@@ -58,11 +58,6 @@ export type DDBTranscription = {
    * @default 0
    */
   transcriptionLength: number;
-  /**
-   * The audio file extension of the transcription
-   * @example "mp3"
-   */
-  audioExtension: string;
 };
 
 export type Transcription = Pick<DDBTranscription, "id" | "createdAt">;

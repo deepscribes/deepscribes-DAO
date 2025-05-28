@@ -54,7 +54,6 @@ export class TranscriptionDao {
       status: params.status,
       createdAt,
       userId: params.userId,
-      audioExtension: params.audioExtension,
       transcriptionLength: params.transcriptionLength || 0,
     } as const as DDBTranscription;
 
@@ -64,7 +63,6 @@ export class TranscriptionDao {
       status: { S: params.status },
       createdAt: { S: createdAt },
       userId: { S: params.userId },
-      audioExtension: { S: params.audioExtension },
       transcriptionLength: {
         N: params.transcriptionLength?.toString() || "0",
       },
