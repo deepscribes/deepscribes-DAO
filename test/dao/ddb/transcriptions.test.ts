@@ -28,6 +28,20 @@ beforeEach(() => {
   jest.clearAllMocks();
 });
 
+describe("TranscriptionDao Initialization", () => {
+  test("should initialize with correct table name", () => {
+    process.env.DDB_TABLE_NAME = SAMPLE_TRANSCRIPTION_TABLE_NAME;
+    const transcriptionDao = new TranscriptionDao();
+    expect(transcriptionDao).toBeDefined();
+  });
+  test("should throw error if DDB_TABLE_NAME is not set", () => {
+    delete process.env.DDB_TABLE_NAME;
+    expect(() => new TranscriptionDao()).toThrow(
+      "Couldn't load DDB_TABLE_NAME"
+    );
+  });
+});
+
 describe("Transcriptions DAO Unit Tests", () => {
   process.env.DDB_TABLE_NAME = SAMPLE_TRANSCRIPTION_TABLE_NAME;
   const transcriptionDao = new TranscriptionDao();
@@ -232,6 +246,29 @@ describe("Transcriptions DAO Unit Tests", () => {
           },
           ExpressionAttributeValues: {
             ":transcriptionLength": { N: newLength.toString() },
+          },
+        }),
+      })
+    );
+  });
+
+  test("updateTranscriptionRefinementPrompt should call UpdateItemCommand with correct prompt update", async () => {
+    mockedSend.mockResolvedValueOnce({});
+    const newPrompt = "New refinement prompt";
+    await transcriptionDao.updateTranscriptionRefinementPrompt(
+      SAMPLE_TRANSCRIPTION_ID,
+      newPrompt
+    );
+
+    expect(mockedSend).toHaveBeenCalledWith(
+      expect.objectContaining({
+        input: expect.objectContaining({
+          TableName: SAMPLE_TRANSCRIPTION_TABLE_NAME,
+          Key: { id: { S: SAMPLE_TRANSCRIPTION_ID } },
+          UpdateExpression: "SET #refinementPrompt = :prompt",
+          ExpressionAttributeNames: { "#refinementPrompt": "refinementPrompt" },
+          ExpressionAttributeValues: {
+            ":prompt": { S: newPrompt },
           },
         }),
       })

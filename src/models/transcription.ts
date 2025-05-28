@@ -58,6 +58,10 @@ export type DDBTranscription = {
    * @default 0
    */
   transcriptionLength: number;
+  /**
+   * The prompt used for refining the transcription. If not provided, the default will be used.
+   */
+  refinementPrompt?: string;
 };
 
 export type Transcription = Pick<DDBTranscription, "id" | "createdAt">;

@@ -70,7 +70,7 @@ export class TranscriptionDao {
 
     const res = await this.ddbClient.send(
       new PutItemCommand({
-        TableName: process.env.DDB_TABLE_NAME,
+        TableName: this.tableName,
         Item: item,
       })
     );
@@ -91,7 +91,7 @@ export class TranscriptionDao {
   ): Promise<DDBTranscription | null> {
     const result = await this.ddbClient.send(
       new GetItemCommand({
-        TableName: process.env.DDB_TABLE_NAME,
+        TableName: this.tableName,
         Key: { id: { S: id } },
       })
     );
@@ -111,7 +111,7 @@ export class TranscriptionDao {
   ): Promise<DDBTranscription[]> {
     const result = await this.ddbClient.send(
       new QueryCommand({
-        TableName: process.env.DDB_TABLE_NAME,
+        TableName: this.tableName,
         // Sync with CDK
         IndexName: "TranscriptionUserIdIndex",
         KeyConditionExpression: "userId = :uid",
@@ -134,7 +134,7 @@ export class TranscriptionDao {
   ): Promise<void> {
     await this.ddbClient.send(
       new UpdateItemCommand({
-        TableName: process.env.DDB_TABLE_NAME,
+        TableName: this.tableName,
         Key: { id: { S: id } },
         UpdateExpression: "SET #title = :title",
         ExpressionAttributeNames: { "#title": "title" },
@@ -154,7 +154,7 @@ export class TranscriptionDao {
   ): Promise<void> {
     await this.ddbClient.send(
       new UpdateItemCommand({
-        TableName: process.env.DDB_TABLE_NAME,
+        TableName: this.tableName,
         Key: { id: { S: id } },
         UpdateExpression: "SET #status = :status",
         ExpressionAttributeNames: { "#status": "status" },
@@ -174,7 +174,7 @@ export class TranscriptionDao {
   ): Promise<void> {
     await this.ddbClient.send(
       new UpdateItemCommand({
-        TableName: process.env.DDB_TABLE_NAME,
+        TableName: this.tableName,
         Key: { id: { S: id } },
         UpdateExpression: "SET #transcriptionLength = :transcriptionLength",
         ExpressionAttributeNames: {
@@ -187,6 +187,21 @@ export class TranscriptionDao {
     );
   }
 
+  public async updateTranscriptionRefinementPrompt(
+    transcriptionId: TranscriptionId,
+    prompt: string
+  ): Promise<void> {
+    await this.ddbClient.send(
+      new UpdateItemCommand({
+        TableName: this.tableName,
+        Key: { id: { S: transcriptionId } },
+        UpdateExpression: "SET #refinementPrompt = :prompt",
+        ExpressionAttributeNames: { "#refinementPrompt": "refinementPrompt" },
+        ExpressionAttributeValues: { ":prompt": { S: prompt } },
+      })
+    );
+  }
+
   /**
    * Deletes a transcription
    * @param id - The transcription ID to delete
@@ -195,7 +210,7 @@ export class TranscriptionDao {
   public async deleteTranscription(id: TranscriptionId) {
     return await this.ddbClient.send(
       new DeleteItemCommand({
-        TableName: process.env.DDB_TABLE_NAME,
+        TableName: this.tableName,
         Key: { id: { S: id } },
       })
     );
