@@ -34,21 +34,21 @@
   },
   "homepage": "https://github.com/deepscribes/deepscribes-DAO#readme",
   "devDependencies": {
-    "@types/jest": "^29.5.14",
-    "@types/node": "^22.14.1",
+    "@types/jest": "^30.0.0",
+    "@types/node": "^24.0.3",
     "dotenv-cli": "^8.0.0",
-    "jest": "^29.7.0",
+    "jest": "^30.0.2",
     "loadenv": "^2.2.0",
-    "ts-jest": "^29.3.2",
+    "ts-jest": "^29.4.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.8.3"
   },
   "dependencies": {
-    "@aws-sdk/client-dynamodb": "^3.788.0",
-    "@aws-sdk/client-s3": "^3.787.0",
-    "@aws-sdk/client-ses": "^3.787.0",
-    "@aws-sdk/s3-request-presigner": "^3.787.0",
-    "@aws-sdk/util-dynamodb": "^3.788.0",
-    "@clerk/backend": "^1.32.2"
+    "@aws-sdk/client-dynamodb": "^3.830.0",
+    "@aws-sdk/client-s3": "^3.832.0",
+    "@aws-sdk/client-ses": "^3.830.0",
+    "@aws-sdk/s3-request-presigner": "^3.832.0",
+    "@aws-sdk/util-dynamodb": "^3.830.0",
+    "@clerk/backend": "^2.1.0"
   }
 }
