@@ -15,7 +15,7 @@ import {
   TranscriptionId,
   TranscriptionStatus,
 } from "../../models/transcription";
-import { unmarshall } from "@aws-sdk/util-dynamodb";
+import { marshall, unmarshall } from "@aws-sdk/util-dynamodb";
 
 export type CreateTranscriptionInput = Omit<
   DDBTranscription,
@@ -57,16 +57,9 @@ export class TranscriptionDao {
       transcriptionLength: params.transcriptionLength || 0,
     } as const as DDBTranscription;
 
-    const item: Record<string, AttributeValue> = {
-      id: { S: transcriptionId },
-      title: { S: params.title },
-      status: { S: params.status },
-      createdAt: { S: createdAt },
-      userId: { S: params.userId },
-      transcriptionLength: {
-        N: params.transcriptionLength?.toString() || "0",
-      },
-    };
+    const item = marshall(transcription, {
+      removeUndefinedValues: true,
+    }) as Record<string, AttributeValue>;
 
     const res = await this.ddbClient.send(
       new PutItemCommand({
