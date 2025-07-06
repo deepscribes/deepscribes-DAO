@@ -19,7 +19,7 @@ jobs:
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       AWS_REGION: ${{ secrets.AWS_REGION }}
       DDB_TABLE_NAME: ${{ secrets.DDB_TABLE_NAME }}
-      DDB_IDEMPOTENCY_TABLE_NAME: ${{ secrets.DDB_IDEMPOTENCY_TABLE_NAME }}
+      DDB_SUBSCRIPTIONS_TABLE_NAME: ${{ secrets.DDB_SUBSCRIPTIONS_TABLE_NAME }}
       CLERK_API_KEY: ${{ secrets.CLERK_API_KEY }}
 
     steps:

@@ -1,3 +1,4 @@
+import { Subscription, SubscriptionPlan } from "../src/models/subscription";
 import {
   DDBTranscription,
   TranscriptionStatus,
@@ -13,9 +14,11 @@ export const MOCK_TRANSCRIPTIONS_BUCKET_NAME = "mock-transcriptions-bucket";
 export const MOCK_TRANSCRIPTION_TEMP_BUCKET_NAME = "mock-temp-bucket";
 
 // ======= DDB ========
+export const SAMPLE_USER_ID = "clerk__user_id";
+
+// Transcription
 export const SAMPLE_TRANSCRIPTION_TABLE_NAME = "transcriptions";
 export const SAMPLE_TRANSCRIPTION_ID = "1";
-export const SAMPLE_USER_ID = "clerk__user_id";
 export const SAMPLE_TRANSCRIPTION_TITLE = "Test Transcription";
 export const SAMPLE_ANOTHER_TRANSCRIPTION_TITLE = "Another Test Transcription";
 export const SAMPLE_TRANSCRIPTION_CREATED_AT_DATE = new Date(
@@ -43,3 +46,29 @@ export const SAMPLE_TRANSCRIPTION_ITEM = {
 
 export const SAMPLE_TRANSCRIPTION_IDEMPOTENCY_ID = "idempotency_id_123";
 export const SAMPLE_ANOTHER_TRANSCRIPTION_IDEMPOTENCY_ID = "idempotency_id_456";
+
+// Subscription
+export const SAMPLE_SUBSCRIPTION_TABLE_NAME = "subscriptions";
+export const SAMPLE_SUBSCRIPTION_ID = "sub-123";
+export const SAMPLE_SUBSCRIPTION: Subscription = {
+  id: SAMPLE_SUBSCRIPTION_ID,
+  userId: SAMPLE_USER_ID,
+  plan: "basic" as SubscriptionPlan,
+  expirationDate: "2025-12-31T23:59:59Z",
+  createdAt: "2025-07-06T12:00:00Z",
+  updatedAt: "2025-07-06T12:00:00Z",
+  isTrial: false,
+};
+export const SAMPLE_SUBSCRIPTION_FT: Subscription = {
+  ...SAMPLE_SUBSCRIPTION,
+  isTrial: true,
+};
+export const SAMPLE_SUBSCRIPTION_ITEM = {
+  id: { S: SAMPLE_SUBSCRIPTION_ID },
+  userId: { S: SAMPLE_USER_ID },
+  plan: { S: "basic" },
+  expirationDate: { S: "2025-12-31T23:59:59Z" },
+  createdAt: { S: "2025-07-06T12:00:00Z" },
+  updatedAt: { S: "2025-07-06T12:00:00Z" },
+  isTrial: { BOOL: false },
+};
