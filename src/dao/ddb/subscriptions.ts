@@ -27,11 +27,12 @@ export class SubscriptionDao {
     userId: string,
     plan: SubscriptionPlan,
     expirationDate: string,
-    isTrial: boolean = false
+    isTrial: boolean = false,
+    subscriptionId?: string
   ) {
     const createdAt = new Date().toISOString();
     const updatedAt = createdAt;
-    const id = randomUUID();
+    const id = subscriptionId || randomUUID();
 
     const subscription: Subscription = {
       id,
