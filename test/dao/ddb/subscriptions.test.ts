@@ -50,6 +50,7 @@ describe("SubscriptionDao Unit Tests", () => {
     const result = await dao.createSubscription(
       SAMPLE_USER_ID,
       SAMPLE_SUBSCRIPTION.plan,
+      SAMPLE_SUBSCRIPTION.status,
       SAMPLE_SUBSCRIPTION.expirationDate,
       SAMPLE_SUBSCRIPTION.isTrial
     );
@@ -66,6 +67,7 @@ describe("SubscriptionDao Unit Tests", () => {
             createdAt: { S: expect.any(String) },
             updatedAt: { S: expect.any(String) },
             isTrial: { BOOL: SAMPLE_SUBSCRIPTION.isTrial },
+            status: { S: SAMPLE_SUBSCRIPTION.status },
           }),
         }),
       })
@@ -84,6 +86,7 @@ describe("SubscriptionDao Unit Tests", () => {
     const result = await dao.createSubscription(
       SAMPLE_USER_ID,
       SAMPLE_SUBSCRIPTION_FT.plan,
+      SAMPLE_SUBSCRIPTION_FT.status,
       SAMPLE_SUBSCRIPTION_FT.expirationDate,
       SAMPLE_SUBSCRIPTION_FT.isTrial
     );
@@ -100,6 +103,7 @@ describe("SubscriptionDao Unit Tests", () => {
             createdAt: { S: expect.any(String) },
             updatedAt: { S: expect.any(String) },
             isTrial: { BOOL: SAMPLE_SUBSCRIPTION_FT.isTrial },
+            status: { S: SAMPLE_SUBSCRIPTION_FT.status },
           }),
         }),
       })

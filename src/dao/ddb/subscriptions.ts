@@ -9,7 +9,11 @@ import {
 import { randomUUID } from "crypto";
 import { ddb } from "../../utils/ddb";
 import { marshall, unmarshall } from "@aws-sdk/util-dynamodb";
-import { Subscription, SubscriptionPlan } from "../../models/subscription";
+import {
+  Subscription,
+  SubscriptionPlan,
+  SubscriptionStatus,
+} from "../../models/subscription";
 
 export class SubscriptionDao {
   private ddbClient: DynamoDBClient;
@@ -26,6 +30,7 @@ export class SubscriptionDao {
   public async createSubscription(
     userId: string,
     plan: SubscriptionPlan,
+    status: SubscriptionStatus,
     expirationDate: string,
     isTrial: boolean = false,
     subscriptionId?: string
@@ -38,6 +43,7 @@ export class SubscriptionDao {
       id,
       userId,
       plan,
+      status,
       expirationDate,
       createdAt,
       updatedAt,

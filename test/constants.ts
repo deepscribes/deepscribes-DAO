@@ -1,4 +1,8 @@
-import { Subscription, SubscriptionPlan } from "../src/models/subscription";
+import {
+  Subscription,
+  SubscriptionPlan,
+  SubscriptionStatus,
+} from "../src/models/subscription";
 import {
   DDBTranscription,
   TranscriptionStatus,
@@ -54,6 +58,7 @@ export const SAMPLE_SUBSCRIPTION: Subscription = {
   id: SAMPLE_SUBSCRIPTION_ID,
   userId: SAMPLE_USER_ID,
   plan: "basic" as SubscriptionPlan,
+  status: "active" as SubscriptionStatus,
   expirationDate: "2025-12-31T23:59:59Z",
   createdAt: "2025-07-06T12:00:00Z",
   updatedAt: "2025-07-06T12:00:00Z",
@@ -71,4 +76,5 @@ export const SAMPLE_SUBSCRIPTION_ITEM = {
   createdAt: { S: "2025-07-06T12:00:00Z" },
   updatedAt: { S: "2025-07-06T12:00:00Z" },
   isTrial: { BOOL: false },
+  status: { S: "active" },
 };

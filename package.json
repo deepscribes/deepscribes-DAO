@@ -1,6 +1,6 @@
 {
   "name": "@deepscribes/deepscribes-dao",
-  "version": "20250721.0.1",
+  "version": "20250807.0.1",
   "description": "The DAO for Deepscribes",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

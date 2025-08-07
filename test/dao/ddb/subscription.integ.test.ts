@@ -19,6 +19,7 @@ describe("SubscriptionDao Integration", () => {
     const result = await dao.createSubscription(
       SAMPLE_USER_ID,
       SAMPLE_SUBSCRIPTION_PLAN,
+      SAMPLE_SUBSCRIPTION.status,
       SAMPLE_SUBSCRIPTION.expirationDate,
       SAMPLE_SUBSCRIPTION.isTrial
     );
@@ -40,6 +41,7 @@ describe("SubscriptionDao Integration", () => {
     const { subscription } = await dao.createSubscription(
       SAMPLE_USER_ID,
       SAMPLE_SUBSCRIPTION_PLAN,
+      SAMPLE_SUBSCRIPTION.status,
       SAMPLE_SUBSCRIPTION.expirationDate,
       SAMPLE_SUBSCRIPTION.isTrial
     );
@@ -48,6 +50,12 @@ describe("SubscriptionDao Integration", () => {
     expect(result).toBeDefined();
     expect(result!.id).toBe(subscription.id);
     expect(result!.userId).toBe(SAMPLE_USER_ID);
+    expect(result!.plan).toBe(SAMPLE_SUBSCRIPTION_PLAN);
+    expect(result!.expirationDate).toBe(SAMPLE_SUBSCRIPTION.expirationDate);
+    expect(result!.createdAt).toBeDefined();
+    expect(result!.updatedAt).toBeDefined();
+    expect(result!.isTrial).toBe(SAMPLE_SUBSCRIPTION.isTrial);
+    expect(result!.status).toBe(SAMPLE_SUBSCRIPTION.status);
   });
 
   it("returns null for non-existent subscription ID", async () => {
@@ -59,6 +67,15 @@ describe("SubscriptionDao Integration", () => {
     const created = await dao.createSubscription(
       SAMPLE_USER_ID,
       SAMPLE_SUBSCRIPTION_PLAN,
+      SAMPLE_SUBSCRIPTION.status,
+      SAMPLE_SUBSCRIPTION.expirationDate,
+      SAMPLE_SUBSCRIPTION.isTrial
+    );
+
+    await dao.createSubscription(
+      SAMPLE_USER_ID,
+      SAMPLE_SUBSCRIPTION_PLAN,
+      SAMPLE_SUBSCRIPTION.status,
       SAMPLE_SUBSCRIPTION.expirationDate,
       SAMPLE_SUBSCRIPTION.isTrial
     );
@@ -75,6 +92,7 @@ describe("SubscriptionDao Integration", () => {
     const { subscription } = await dao.createSubscription(
       SAMPLE_USER_ID,
       SAMPLE_SUBSCRIPTION_PLAN,
+      SAMPLE_SUBSCRIPTION.status,
       SAMPLE_SUBSCRIPTION.expirationDate,
       SAMPLE_SUBSCRIPTION.isTrial
     );
@@ -92,11 +110,13 @@ describe("SubscriptionDao Integration", () => {
     await dao.createSubscription(
       SAMPLE_USER_ID,
       SAMPLE_SUBSCRIPTION_PLAN,
+      SAMPLE_SUBSCRIPTION.status,
       SAMPLE_SUBSCRIPTION.expirationDate
     );
     await dao.createSubscription(
       SAMPLE_USER_ID,
       SAMPLE_SUBSCRIPTION_PLAN,
+      SAMPLE_SUBSCRIPTION.status,
       SAMPLE_SUBSCRIPTION.expirationDate
     );
 
