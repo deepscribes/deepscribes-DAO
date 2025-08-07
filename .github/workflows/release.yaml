@@ -2,39 +2,60 @@ name: Build & Publish
 
 permissions:
   contents: write
-  packages: write
 
 on:
   push:
-    tags:
-      - "v*.*.*"
+    branches:
+      - main
 
 jobs:
   release:
     runs-on: ubuntu-latest
 
     env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      AWS_REGION: eu-south-1
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      AWS_REGION: ${{ secrets.AWS_REGION }}
+      CODEARTIFACT_DOMAIN: deepscribes
+      CODEARTIFACT_REPO: deepscribes-dao
+      CODEARTIFACT_ACCOUNT_ID: 885619224957
       DDB_TABLE_NAME: ${{ secrets.DDB_TABLE_NAME }}
       DDB_SUBSCRIPTIONS_TABLE_NAME: ${{ secrets.DDB_SUBSCRIPTIONS_TABLE_NAME }}
       CLERK_API_KEY: ${{ secrets.CLERK_API_KEY }}
 
     steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v3
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Setup Node
+      - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: "18"
-          registry-url: "https://npm.pkg.github.com"
-          scope: "@deepscribes"
+          node-version-file: ".nvmrc"
+
+      - name: Configure npm for AWS CodeArtifact
+        run: |
+          CODEARTIFACT_AUTH_TOKEN=$(aws codeartifact get-authorization-token \
+            --domain $CODEARTIFACT_DOMAIN \
+            --domain-owner $CODEARTIFACT_ACCOUNT_ID \
+            --region $AWS_REGION \
+            --query authorizationToken \
+            --output text)
+
+          echo "@deepscribes:registry=https://${CODEARTIFACT_DOMAIN}-${CODEARTIFACT_ACCOUNT_ID}.d.codeartifact.${AWS_REGION}.amazonaws.com/npm/npm-store/" > .npmrc
+
+          echo "//${CODEARTIFACT_DOMAIN}-${CODEARTIFACT_ACCOUNT_ID}.d.codeartifact.${AWS_REGION}.amazonaws.com/npm/${CODEARTIFACT_REPO}/:_authToken=${CODEARTIFACT_AUTH_TOKEN}" >> .npmrc
+          npm run patch
+          npm ping
 
       - name: Install dependencies
-        run: npm ci
+        run: npm ping && npm ci
 
       - name: Run unit tests
         run: npm test
@@ -45,7 +66,5 @@ jobs:
       - name: Build project
         run: npm run build
 
-      - name: Publish to GitHub Packages
+      - name: Publish to AWS CodeArtifact
         run: npm publish
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
