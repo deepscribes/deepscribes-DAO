@@ -14,8 +14,8 @@
     "test:unit": "jest --testMatch \"**/*.test.ts\" --testPathIgnorePatterns=\".*\\.integ\\.test\\.ts$\" --coverage",
     "test:integ": "node run_integ.js",
     "test:integration": "jest --testMatch \"**/*.integ.test.ts\"",
-    "patch": "npm version \"1.0.$(date +%Y%m%d)\" --no-git-tag-version --allow-same-version",
-    "postpush": "git tag \"v1.0.$(date +%Y%m%d)\" && git push origin \"v1.0.$(date +%Y%m%d)\""
+    "patch": "npm version \"1.0.$(date +%Y%m%d%H%M%S)\" --no-git-tag-version --allow-same-version",
+    "postpush": "git tag \"v1.0.$(date +%Y%m%d%H%M%S)\" && git push origin \"v1.0.$(date +%Y%m%d%H%M%S)\""
   },
   "repository": {
     "type": "git",
