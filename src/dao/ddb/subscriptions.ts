@@ -67,6 +67,44 @@ export class SubscriptionDao {
     };
   }
 
+  public async updateSubscription(
+    subscriptionId: string,
+    newSubscription: Partial<
+      Omit<Subscription, "id" | "createdAt" | "updatedAt">
+    >
+  ) {
+    const oldSubscription = await this.getSubscriptionById(subscriptionId);
+    const updatedAt = oldSubscription?.updatedAt || new Date().toISOString();
+
+    const subscription: Subscription = {
+      id: subscriptionId,
+      userId: newSubscription.userId ?? oldSubscription.userId,
+      plan: newSubscription.plan ?? oldSubscription.plan,
+      status: newSubscription.status ?? oldSubscription.status,
+      expirationDate:
+        newSubscription.expirationDate ?? oldSubscription.expirationDate,
+      createdAt: oldSubscription.createdAt,
+      updatedAt,
+      isTrial: newSubscription.isTrial ?? oldSubscription.isTrial,
+    };
+
+    const item = marshall(subscription, {
+      removeUndefinedValues: true,
+    });
+
+    const res = await this.ddbClient.send(
+      new PutItemCommand({
+        TableName: this.tableName,
+        Item: item,
+      })
+    );
+
+    return {
+      subscription,
+      $metadata: res.$metadata,
+    };
+  }
+
   public async getSubscriptionById(id: string): Promise<Subscription | null> {
     const result = await this.ddbClient.send(
       new GetItemCommand({

@@ -1,4 +1,5 @@
 import { SubscriptionDao } from "../../../src/dao/ddb/subscriptions";
+import { SubscriptionPlan } from "../../../src/models/subscription";
 import { SAMPLE_SUBSCRIPTION, SAMPLE_USER_ID } from "../../constants";
 
 const SAMPLE_SUBSCRIPTION_PLAN = SAMPLE_SUBSCRIPTION.plan;
@@ -86,6 +87,26 @@ describe("SubscriptionDao Integration", () => {
     const match = results.find((s) => s.id === created.subscription.id);
     expect(match).toBeDefined();
     expect(match!.userId).toBe(SAMPLE_USER_ID);
+  });
+
+  it("correctly updates a subscription", async () => {
+    const { subscription } = await dao.createSubscription(
+      SAMPLE_USER_ID,
+      SAMPLE_SUBSCRIPTION_PLAN,
+      SAMPLE_SUBSCRIPTION.status,
+      SAMPLE_SUBSCRIPTION.expirationDate,
+      SAMPLE_SUBSCRIPTION.isTrial
+    );
+
+    const updated = await dao.updateSubscription(subscription.id, {
+      plan: "unlimited" as SubscriptionPlan,
+    });
+
+    expect(updated).toBeDefined();
+    expect(updated.subscription.id).toBe(subscription.id);
+    expect(updated.subscription.plan).toBe("unlimited");
+    expect(updated.subscription.updatedAt).toBeDefined();
+    expect(updated.subscription.createdAt).toBe(subscription.createdAt);
   });
 
   it("deletes a subscription", async () => {

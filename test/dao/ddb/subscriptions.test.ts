@@ -1,6 +1,7 @@
 // tests/dao/subscription.test.ts
 
 import { SubscriptionDao } from "../../../src/dao/ddb/subscriptions";
+import { SubscriptionPlan } from "../../../src/models/subscription";
 import { ddb } from "../../../src/utils/ddb";
 
 import {
@@ -113,6 +114,76 @@ describe("SubscriptionDao Unit Tests", () => {
       plan: SAMPLE_SUBSCRIPTION_FT.plan,
       expirationDate: SAMPLE_SUBSCRIPTION_FT.expirationDate,
       isTrial: SAMPLE_SUBSCRIPTION_FT.isTrial,
+    });
+  });
+
+  test("updateSubscription should call PutItemCommand with correct params when no change happened", async () => {
+    mockedSend
+      .mockResolvedValueOnce({ Item: SAMPLE_SUBSCRIPTION_ITEM }) // GetItem
+      .mockResolvedValueOnce({ $metadata: { httpStatusCode: 200 } }); // PutItem
+
+    const result = await dao.updateSubscription(SAMPLE_SUBSCRIPTION_ID, {
+      ...SAMPLE_SUBSCRIPTION,
+    });
+
+    expect(mockedSend).toHaveBeenNthCalledWith(
+      2,
+      expect.objectContaining({
+        input: expect.objectContaining({
+          TableName: SAMPLE_SUBSCRIPTION_TABLE_NAME,
+          Item: expect.objectContaining({
+            id: { S: SAMPLE_SUBSCRIPTION_ID },
+            userId: { S: SAMPLE_USER_ID },
+            plan: { S: SAMPLE_SUBSCRIPTION.plan },
+            expirationDate: { S: SAMPLE_SUBSCRIPTION.expirationDate },
+            createdAt: { S: expect.any(String) },
+            updatedAt: { S: expect.any(String) },
+            isTrial: { BOOL: SAMPLE_SUBSCRIPTION.isTrial },
+            status: { S: SAMPLE_SUBSCRIPTION.status },
+          }),
+        }),
+      })
+    );
+    expect(result.subscription).toMatchObject({
+      userId: SAMPLE_USER_ID,
+      plan: SAMPLE_SUBSCRIPTION.plan,
+      expirationDate: SAMPLE_SUBSCRIPTION.expirationDate,
+      isTrial: SAMPLE_SUBSCRIPTION.isTrial,
+    });
+  });
+
+  test("updateSubscription should override specified parameters while leaving others unchanged", async () => {
+    mockedSend
+      .mockResolvedValueOnce({ Item: SAMPLE_SUBSCRIPTION_ITEM }) // GetItem
+      .mockResolvedValueOnce({ $metadata: { httpStatusCode: 200 } }); // PutItem
+
+    const result = await dao.updateSubscription(SAMPLE_SUBSCRIPTION_ID, {
+      plan: "unlimited" as SubscriptionPlan,
+    });
+
+    expect(mockedSend).toHaveBeenNthCalledWith(
+      2,
+      expect.objectContaining({
+        input: expect.objectContaining({
+          TableName: SAMPLE_SUBSCRIPTION_TABLE_NAME,
+          Item: expect.objectContaining({
+            id: { S: SAMPLE_SUBSCRIPTION_ID },
+            userId: { S: SAMPLE_USER_ID },
+            plan: { S: "unlimited" },
+            expirationDate: { S: SAMPLE_SUBSCRIPTION.expirationDate },
+            createdAt: { S: expect.any(String) },
+            updatedAt: { S: expect.any(String) },
+            isTrial: { BOOL: SAMPLE_SUBSCRIPTION.isTrial },
+            status: { S: SAMPLE_SUBSCRIPTION.status },
+          }),
+        }),
+      })
+    );
+    expect(result.subscription).toMatchObject({
+      userId: SAMPLE_USER_ID,
+      plan: "unlimited",
+      expirationDate: SAMPLE_SUBSCRIPTION.expirationDate,
+      isTrial: SAMPLE_SUBSCRIPTION.isTrial,
     });
   });
 

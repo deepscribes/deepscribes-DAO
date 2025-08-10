@@ -77,4 +77,4 @@ export const SAMPLE_SUBSCRIPTION_ITEM = {
   updatedAt: { S: "2025-07-06T12:00:00Z" },
   isTrial: { BOOL: false },
   status: { S: "active" },
-};
+} as const;
