@@ -1,7 +1,10 @@
 // tests/dao/subscription.test.ts
 
 import { SubscriptionDao } from "../../../src/dao/ddb/subscriptions";
-import { SubscriptionPlan } from "../../../src/models/subscription";
+import {
+  SubscriptionPlan,
+  SubscriptionStatus,
+} from "../../../src/models/subscription";
 import { ddb } from "../../../src/utils/ddb";
 
 import {
@@ -210,7 +213,7 @@ describe("SubscriptionDao Unit Tests", () => {
     expect(result).toBeNull();
   });
 
-  test("getUserSubscriptions should return all subscriptions", async () => {
+  test("getUserSubscriptions should return all active subscriptions", async () => {
     mockedSend.mockResolvedValueOnce({ Items: [SAMPLE_SUBSCRIPTION_ITEM] });
 
     const result = await dao.getUserSubscriptions(SAMPLE_USER_ID);
@@ -221,8 +224,13 @@ describe("SubscriptionDao Unit Tests", () => {
           TableName: SAMPLE_SUBSCRIPTION_TABLE_NAME,
           IndexName: "SubscriptionUserIdIndex",
           KeyConditionExpression: "userId = :userId",
+          FilterExpression: "#transcription_status = :status",
           ExpressionAttributeValues: {
             ":userId": { S: SAMPLE_USER_ID },
+            ":status": { S: "active" as SubscriptionStatus },
+          },
+          ExpressionAttributeNames: {
+            "#transcription_status": "status",
           },
         }),
       })

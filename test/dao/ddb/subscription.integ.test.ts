@@ -64,7 +64,7 @@ describe("SubscriptionDao Integration", () => {
     expect(result).toBeNull();
   });
 
-  it("returns all subscriptions for a user", async () => {
+  it("returns all active subscriptions for a user", async () => {
     const created = await dao.createSubscription(
       SAMPLE_USER_ID,
       SAMPLE_SUBSCRIPTION_PLAN,
@@ -81,8 +81,20 @@ describe("SubscriptionDao Integration", () => {
       SAMPLE_SUBSCRIPTION.isTrial
     );
 
+    const expiredSubscription = await dao.createSubscription(
+      SAMPLE_USER_ID,
+      SAMPLE_SUBSCRIPTION_PLAN,
+      "expired",
+      SAMPLE_SUBSCRIPTION.expirationDate,
+      SAMPLE_SUBSCRIPTION.isTrial
+    );
+
     const results = await dao.getUserSubscriptions(SAMPLE_USER_ID);
     expect(results.length).toBeGreaterThan(0);
+    expect(results.every((s) => s.status === "active")).toBe(true);
+    expect(
+      results.filter((s) => s.id === expiredSubscription.subscription.id)
+    ).toHaveLength(0);
 
     const match = results.find((s) => s.id === created.subscription.id);
     expect(match).toBeDefined();

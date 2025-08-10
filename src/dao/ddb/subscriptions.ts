@@ -124,8 +124,13 @@ export class SubscriptionDao {
         TableName: this.tableName,
         IndexName: "SubscriptionUserIdIndex",
         KeyConditionExpression: "userId = :userId",
+        FilterExpression: "#transcription_status = :status",
         ExpressionAttributeValues: {
           ":userId": { S: userId },
+          ":status": { S: "active" as SubscriptionStatus },
+        },
+        ExpressionAttributeNames: {
+          "#transcription_status": "status",
         },
       })
     );
