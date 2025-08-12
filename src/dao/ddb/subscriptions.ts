@@ -3,7 +3,6 @@ import {
   GetItemCommand,
   QueryCommand,
   DeleteItemCommand,
-  AttributeValue,
   type DynamoDBClient,
 } from "@aws-sdk/client-dynamodb";
 import { randomUUID } from "crypto";

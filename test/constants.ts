@@ -57,8 +57,8 @@ export const SAMPLE_SUBSCRIPTION_ID = "sub-123";
 export const SAMPLE_SUBSCRIPTION: Subscription = {
   id: SAMPLE_SUBSCRIPTION_ID,
   userId: SAMPLE_USER_ID,
-  plan: "basic" as SubscriptionPlan,
-  status: "active" as SubscriptionStatus,
+  plan: "free" satisfies SubscriptionPlan,
+  status: "active" satisfies SubscriptionStatus,
   expirationDate: "2025-12-31T23:59:59Z",
   createdAt: "2025-07-06T12:00:00Z",
   updatedAt: "2025-07-06T12:00:00Z",
@@ -71,10 +71,10 @@ export const SAMPLE_SUBSCRIPTION_FT: Subscription = {
 export const SAMPLE_SUBSCRIPTION_ITEM = {
   id: { S: SAMPLE_SUBSCRIPTION_ID },
   userId: { S: SAMPLE_USER_ID },
-  plan: { S: "basic" },
+  plan: { S: "free" satisfies SubscriptionPlan },
   expirationDate: { S: "2025-12-31T23:59:59Z" },
   createdAt: { S: "2025-07-06T12:00:00Z" },
   updatedAt: { S: "2025-07-06T12:00:00Z" },
   isTrial: { BOOL: false },
-  status: { S: "active" },
+  status: { S: "active" satisfies SubscriptionStatus },
 } as const;

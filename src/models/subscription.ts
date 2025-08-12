@@ -1,4 +1,4 @@
-export type SubscriptionPlan = "free" | "solo" | "unlimited";
+export type SubscriptionPlan = "free" | "unlimited";
 export type SubscriptionStatus = "active" | "expired";
 
 type ISO8061String = string; // ISO 8601 date string, e.g., "2023-10-01T12:00:00Z"
