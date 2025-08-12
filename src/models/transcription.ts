@@ -14,6 +14,14 @@ export enum TranscriptionStatus {
    */
   READY = "ready",
   /**
+   * User plan limits exceeded
+   */
+  PLAN_LIMITS_EXCEEDED = "plan_limits_exceeded",
+  /**
+   * User rate limits exceeded
+   */
+  RATE_LIMITS_EXCEEDED = "rate_limits_exceeded",
+  /**
    * The transcription has failed.
    */
   ERROR = "error",
