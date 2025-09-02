@@ -100,6 +100,28 @@ describe("Transcriptions DAO Unit Tests", () => {
     );
   });
 
+  test("createTranscription should call PutItemCommand with isTruncated set to false if missing from parameters", async () => {
+    mockedSend.mockResolvedValueOnce({});
+
+    await transcriptionDao.createTranscription({
+      title: SAMPLE_TRANSCRIPTION.title,
+      status: SAMPLE_TRANSCRIPTION.status,
+      userId: SAMPLE_TRANSCRIPTION.userId,
+      id: SAMPLE_TRANSCRIPTION_ID,
+    });
+
+    expect(mockedSend).toHaveBeenCalledWith(
+      expect.objectContaining({
+        input: expect.objectContaining({
+          TableName: SAMPLE_TRANSCRIPTION_TABLE_NAME,
+          Item: expect.objectContaining({
+            isTruncated: { BOOL: false },
+          }),
+        }),
+      })
+    );
+  });
+
   test("createTranscription should call PutItemCommand and create an id if not present", async () => {
     mockedSend.mockResolvedValueOnce({});
 
@@ -240,13 +262,45 @@ describe("Transcriptions DAO Unit Tests", () => {
         input: expect.objectContaining({
           TableName: SAMPLE_TRANSCRIPTION_TABLE_NAME,
           Key: { id: { S: SAMPLE_TRANSCRIPTION_ID } },
-          UpdateExpression: "SET #transcriptionLength = :transcriptionLength",
-          ExpressionAttributeNames: {
+          UpdateExpression:
+            "SET #transcriptionLength = :transcriptionLength, #isTruncated = :isTruncated",
+          ExpressionAttributeNames: expect.objectContaining({
             "#transcriptionLength": "transcriptionLength",
-          },
-          ExpressionAttributeValues: {
+            "#isTruncated": "isTruncated",
+          }),
+          ExpressionAttributeValues: expect.objectContaining({
             ":transcriptionLength": { N: newLength.toString() },
-          },
+            ":isTruncated": { BOOL: false },
+          }),
+        }),
+      })
+    );
+  });
+
+  test("updateTranscriptionLength should update isTruncated if set", async () => {
+    mockedSend.mockResolvedValueOnce({});
+    const newLength = 120.5;
+    await transcriptionDao.updateTranscriptionDuration(
+      SAMPLE_TRANSCRIPTION_ID,
+      newLength,
+      true
+    );
+
+    expect(mockedSend).toHaveBeenCalledWith(
+      expect.objectContaining({
+        input: expect.objectContaining({
+          TableName: SAMPLE_TRANSCRIPTION_TABLE_NAME,
+          Key: { id: { S: SAMPLE_TRANSCRIPTION_ID } },
+          UpdateExpression:
+            "SET #transcriptionLength = :transcriptionLength, #isTruncated = :isTruncated",
+          ExpressionAttributeNames: expect.objectContaining({
+            "#transcriptionLength": "transcriptionLength",
+            "#isTruncated": "isTruncated",
+          }),
+          ExpressionAttributeValues: expect.objectContaining({
+            ":transcriptionLength": { N: newLength.toString() },
+            ":isTruncated": { BOOL: true },
+          }),
         }),
       })
     );

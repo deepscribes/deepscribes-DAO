@@ -37,6 +37,7 @@ export const SAMPLE_TRANSCRIPTION: DDBTranscription = {
   title: SAMPLE_TRANSCRIPTION_TITLE,
   userId: SAMPLE_USER_ID,
   transcriptionLength: SAMPLE_TRANSCRIPTION_LENGTH,
+  isTruncated: false,
 };
 
 export const SAMPLE_TRANSCRIPTION_ITEM = {
@@ -46,6 +47,7 @@ export const SAMPLE_TRANSCRIPTION_ITEM = {
   userId: { S: SAMPLE_USER_ID },
   createdAt: { S: SAMPLE_TRANSCRIPTION_CREATED_AT_DATE },
   transcriptionLength: { N: SAMPLE_TRANSCRIPTION_LENGTH.toString() },
+  isTruncated: { BOOL: false },
 };
 
 export const SAMPLE_TRANSCRIPTION_IDEMPOTENCY_ID = "idempotency_id_123";

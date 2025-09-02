@@ -19,10 +19,11 @@ import { marshall, unmarshall } from "@aws-sdk/util-dynamodb";
 
 export type CreateTranscriptionInput = Omit<
   DDBTranscription,
-  "id" | "createdAt" | "transcriptionLength"
+  "id" | "createdAt" | "transcriptionLength" | "isTruncated"
 > & {
-  id?: TranscriptionId | undefined;
-  transcriptionLength?: number | undefined;
+  id?: TranscriptionId;
+  transcriptionLength?: number;
+  isTruncated?: boolean;
 };
 
 export class TranscriptionDao {
@@ -55,6 +56,7 @@ export class TranscriptionDao {
       createdAt,
       userId: params.userId,
       transcriptionLength: params.transcriptionLength || 0,
+      isTruncated: params.isTruncated || false,
     } as const as DDBTranscription;
 
     const item = marshall(transcription, {
@@ -163,18 +165,22 @@ export class TranscriptionDao {
    */
   public async updateTranscriptionDuration(
     id: TranscriptionId,
-    duration: number
+    duration: number,
+    isTruncated: boolean = false
   ): Promise<void> {
     await this.ddbClient.send(
       new UpdateItemCommand({
         TableName: this.tableName,
         Key: { id: { S: id } },
-        UpdateExpression: "SET #transcriptionLength = :transcriptionLength",
+        UpdateExpression:
+          "SET #transcriptionLength = :transcriptionLength, #isTruncated = :isTruncated",
         ExpressionAttributeNames: {
           "#transcriptionLength": "transcriptionLength",
+          "#isTruncated": "isTruncated",
         },
         ExpressionAttributeValues: {
           ":transcriptionLength": { N: duration.toString() },
+          ":isTruncated": { BOOL: isTruncated },
         },
       })
     );

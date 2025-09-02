@@ -14,14 +14,6 @@ export enum TranscriptionStatus {
    */
   READY = "ready",
   /**
-   * User plan limits exceeded
-   */
-  PLAN_LIMITS_EXCEEDED = "plan_limits_exceeded",
-  /**
-   * User rate limits exceeded
-   */
-  RATE_LIMITS_EXCEEDED = "rate_limits_exceeded",
-  /**
    * The transcription has failed.
    */
   ERROR = "error",
@@ -66,6 +58,12 @@ export type DDBTranscription = {
    * @default 0
    */
   transcriptionLength: number;
+  /**
+   * Whether the transcription was truncated because the user has the free tier and the transcription was over their limits
+   * @readonly
+   * @default false
+   */
+  isTruncated: boolean;
   /**
    * The prompt used for refining the transcription. If not provided, the default will be used.
    */
