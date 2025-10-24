@@ -22,7 +22,7 @@
     "url": "git+https://github.com/deepscribes/deepscribes-DAO.git"
   },
   "publishConfig": {
-    "registry": "https://deepscribes-885619224957.d.codeartifact.eu-south-1.amazonaws.com/npm/deepscribes-dao/"
+    "registry": "https://deepscribes-786914421882.d.codeartifact.eu-south-1.amazonaws.com/npm/deepscribes-dao/"
   },
   "keywords": [
     "DAO"
