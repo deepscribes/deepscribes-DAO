@@ -9,7 +9,7 @@
   ],
   "scripts": {
     "build": "tsc",
-    "test": "npm run test:full",
+    "test": "npm run test:unit",
     "test:full": "npm run test:unit && npm run test:integ",
     "test:unit": "jest --testMatch \"**/*.test.ts\" --testPathIgnorePatterns=\".*\\.integ\\.test\\.ts$\" --coverage",
     "test:integ": "node run_integ.js",
@@ -22,7 +22,7 @@
     "url": "git+https://github.com/deepscribes/deepscribes-DAO.git"
   },
   "publishConfig": {
-    "registry": "https://deepscribes-885619224957.d.codeartifact.eu-south-1.amazonaws.com/npm/deepscribes-dao/"
+    "registry": "https://deepscribes-786914421882.d.codeartifact.eu-south-1.amazonaws.com/npm/deepscribes-dao/"
   },
   "keywords": [
     "DAO"
